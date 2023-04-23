@@ -4,7 +4,7 @@
 | Forename | Surname  | Matr.#  |
 |----------|----------|---------|
 | Nina     | Mertins  | 2107539 |
-| Kevin    | Hartmann | xxxxxx  |
+| Kevin    | Hartmann | 1996265 |
 | Alessio  | Negrini  | 2106547 |
 
 ## Folder Structure

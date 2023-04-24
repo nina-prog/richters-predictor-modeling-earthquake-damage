@@ -11,12 +11,14 @@
 ```
 📦phase-1
  ┣ 📂data                    <-- Data used as input during development with Jupyter notebooks. 
+ ┃ ┗ 📂raw                   <-- Contains the raw data provided by the supervisors.
  ┣ 📂models                  <-- Saved models during Development.
  ┣ 📂notebooks               <-- Jupyter Notebooks used in development.
+ ┃ ┗ 📂weekXX                <-- Contains the weekly subtasks.
  ┣ 📂src                     <-- The customized project packages containing all utility functions and source codes.
  ┣ 📜.gitignore 
  ┣ 📜README.md               <-- The top-level README for developers using this project. 
- ┗ 📜requirements.txt       <-- The requirenments file for reproducing the environment, e.g. generated with 
+ ┗ 📜requirements.txt        <-- The requirenments file for reproducing the environment, e.g. generated with 
                                  'pip freeze > requirenments.txt'.
 ```
 

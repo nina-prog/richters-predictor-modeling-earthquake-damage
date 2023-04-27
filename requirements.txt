@@ -78,6 +78,7 @@ pyrsistent @ file:///home/builder/ci_310/pyrsistent_1640807196327/work
 PySocks @ file:///home/builder/ci_310/pysocks_1640793678128/work
 python-dateutil @ file:///tmp/build/80754af9/python-dateutil_1626374649649/work
 pytz==2023.3
+PyYAML==6.0
 pyzmq @ file:///opt/conda/conda-bld/pyzmq_1657724186960/work
 qtconsole @ file:///croot/qtconsole_1681394213385/work
 QtPy @ file:///opt/conda/conda-bld/qtpy_1662014892439/work

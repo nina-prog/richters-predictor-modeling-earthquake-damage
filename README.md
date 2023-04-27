@@ -10,6 +10,7 @@
 ## Folder Structure
 ```
 📦phase-1
+ ┣ 📂config                  <-- Configuration files for the pipeline
  ┣ 📂data                    <-- Data used as input during development with Jupyter notebooks. 
  ┃ ┗ 📂raw                   <-- Contains the raw data provided by the supervisors.
  ┣ 📂models                  <-- Saved models during Development.
@@ -22,3 +23,17 @@
                                  'pip freeze > requirenments.txt'.
 ```
 
+## Setting up the environment and run the code
+1. Clone the repository with:  
+
+       git clone git@git.scc.kit.edu:data-science-lab-2023/group-5-targaryen/phase-1.git
+
+2. Install the requirements:
+
+       pip install -r pahse-1/requirements.txt
+
+3. Insert the data in phase-1/data/raw
+4. Navigate in the source folder and execute the pipeline with:
+
+       cd phase-1/src
+       python main.py --config "../configs/sample_config.yml"

@@ -4,7 +4,14 @@ paths:
     test_values: "data/raw/test_values.csv"
     result: "data/processed/result_001.csv"
 data_cleaning:
-    columns_to_remove: ["", "", ""]
+    columns_to_remove: ['has_secondary_use_rental',
+                        'has_secondary_use_institution',
+                        'has_secondary_use_school',
+                        'has_secondary_use_industry',
+                        'has_secondary_use_health_post',
+                        'has_secondary_use_gov_office',
+                        'has_secondary_use_use_police',
+                        'has_secondary_use_other']
     correlations: 
         - feature_names: ["geo_level_1_id", "geo_level_2_id", "geo_level_3_id", "count_floors_pre_eq", "age", "area_percentage", "height_percentage", "count_families"]
           threshold: 0.7

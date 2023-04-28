@@ -4,6 +4,7 @@ import yaml
 import pandas as pd
 
 from data_cleaning import drop_correlated_features
+from data_cleaning import group_categorical_features
 import modelling
 
 
@@ -48,6 +49,8 @@ test_values.set_index("building_id")
 print("Data cleaning")
 #train_data_cleaned = drop_correlated_features(data=train_values, config=cfg["data_cleaning"]["correlations"])
 #test_data_cleaned = drop_correlated_features(data=test_values, config=cfg["data_cleaning"]["correlations"])
+#train_data_cleaned = group_categorical_features(df=train_values, default_val="others", verbose=False)
+#test_data_cleaned = group_categorical_features(df=test_values, default_val="others", verbose=False)
 train_data_cleaned = train_values
 test_data_cleaned = test_values
 

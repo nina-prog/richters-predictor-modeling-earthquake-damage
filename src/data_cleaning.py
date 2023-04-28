@@ -174,3 +174,36 @@ def drop_correlated_features(data=None, config=None):
             data = data.drop(features_to_drop, axis=1)
     
     return data
+
+
+def group_categorical_features(df: pd.DataFrame, default_val: str = "others", verbose: bool = False) -> pd.DataFrame:
+    """
+    Function that groups categorical features with many unique low populated realizations into "others".
+    Significant for feature that have rarely occurring categorical values, e.g. "plan_configuration".
+    Predefined mappings are within the function and contain the column to apply the mapping and the map itself.
+    Not explicitly listed mappings are replaced with param "default_val", which is "others" (default)
+
+    :param df: DataFrame to apply the mapping
+    :param default_val: Default value to use for not explicit listed maps
+    :param verbose: Bool whether to print information or not (default: False)
+
+    :return: DataFrame with the column replaced with the mapped column
+    """
+
+    # Define mapping for each feature with rarely occuring categorical values
+    mapping_plan_configuration = {"col": "plan_configuration",
+                                  "mapping": {"d": "d"}}
+    mapping_legal_ownership_status = {"col": "legal_ownership_status",
+                                      "mapping": {"v": "v"}}
+    mapping_ground_floor_type = {"col": "ground_floor_type",
+                                 "mapping": {"f": "f", "x": "x", "v": "v"}}
+    # Put in list for iteration
+    mappings = [mapping_plan_configuration, mapping_legal_ownership_status, mapping_ground_floor_type]
+
+    # Apply mapping for each mapping defined in mappings list
+    for mapping in mappings:
+        # Overwrite column to be mapped with mapped values
+        df[mapping.get("col")] = df[mapping.get("col")].map(mapping.get("mapping")).fillna(default_val)
+        if verbose:
+            print(f"Applied mapping / grouping for feature '{mapping.get('col')}'")
+    return df

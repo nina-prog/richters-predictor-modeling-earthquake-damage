@@ -6,6 +6,7 @@ import pandas as pd
 from data_cleaning import drop_correlated_features
 from data_cleaning import group_categorical_features
 from feature_selection import get_top_k_features_using_rfe
+from feature_selection import get_top_k_features_using_mi
 import modelling
 
 
@@ -51,19 +52,19 @@ print("Cleaning Data ...")
 train_data_cleaned = drop_correlated_features(data=train_values, config=cfg["data_cleaning"]["correlations"])
 test_data_cleaned = drop_correlated_features(data=test_values, config=cfg["data_cleaning"]["correlations"])
 
-## Group categorical features with rarely occurring realizations
+# Group categorical features with rarely occurring realizations
 print("Grouping categorical features ...")
 train_data_cleaned = group_categorical_features(df=train_data_cleaned, default_val="others", verbose=False)
 test_data_cleaned = group_categorical_features(df=test_data_cleaned, default_val="others", verbose=False)
 
-## Feature Selection: Get top k=0.5 features
+# Feature Selection: Get top k=0.5 features using RFE, or use MI
 print("Selecting best features using RFE ...")
-best_feats = get_top_k_features_using_rfe(x_train=train_data_cleaned, y_train=test_data_cleaned, k=0.7, step=2, verbose=0)
+best_feats, rfe = get_top_k_features_using_rfe(x_train=train_data_cleaned, y_train=test_data_cleaned, k=0.7, step=2, verbose=0)
+## Or use MI
+#print("Selecting best features using MI ...")
+#best_feats, mi_scores = get_top_k_features_using_mi(x_train=train_data_cleaned, y_train=test_data_cleaned, k=20)
 train_data_cleaned = train_data_cleaned[best_feats]
 test_data_cleaned = test_data_cleaned[best_feats]
-
-#train_data_cleaned = train_values
-#test_data_cleaned = test_values
 
 # Feature engineering: TBD
 

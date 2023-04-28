@@ -66,12 +66,12 @@ def get_top_k_features_using_mi(x_train: pd.DataFrame, y_train: pd.DataFrame, k:
     """
 
     # Compute mutual information scores
-    mi_scores = mutual_info_classif(x_train, y_train.values.flatten())
+    mi_scores = mutual_info_classif(x_train, y_train["damage_grade"].values.flatten())
     mi_scores = pd.Series(mi_scores)
     mi_scores.index = x_train.columns
 
     # Sorts descending based on mi score and gets k first features
-    top_k_features = mi_scores.sort_values(ascending=False)[: k].keys().tolist()
+    top_k_features =  mi_scores.sort_values(ascending=False)[: k].keys().tolist()
 
     return top_k_features, mi_scores
 

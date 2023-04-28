@@ -5,6 +5,7 @@ import pandas as pd
 
 from data_cleaning import drop_correlated_features
 from data_cleaning import group_categorical_features
+from feature_selection import get_top_k_features_using_rfe
 import modelling
 
 
@@ -41,18 +42,28 @@ if not os.path.normpath(test_values_path):
 train_values = pd.read_csv(train_values_path)
 train_labels = pd.read_csv(train_labels_path)
 test_values = pd.read_csv(test_values_path)
-train_values.set_index("building_id")
-test_values.set_index("building_id")
+train_values.set_index("building_id", inplace=True)
+test_values.set_index("building_id", inplace=True)
 
 
 # Data cleaning
 print("Data cleaning")
-#train_data_cleaned = drop_correlated_features(data=train_values, config=cfg["data_cleaning"]["correlations"])
-#test_data_cleaned = drop_correlated_features(data=test_values, config=cfg["data_cleaning"]["correlations"])
-#train_data_cleaned = group_categorical_features(df=train_values, default_val="others", verbose=False)
-#test_data_cleaned = group_categorical_features(df=test_values, default_val="others", verbose=False)
-train_data_cleaned = train_values
-test_data_cleaned = test_values
+train_data_cleaned = drop_correlated_features(data=train_values, config=cfg["data_cleaning"]["correlations"])
+test_data_cleaned = drop_correlated_features(data=test_values, config=cfg["data_cleaning"]["correlations"])
+
+## Group categorical features with rarely occurring realizations
+print("Grouping categorical features")
+train_data_cleaned = group_categorical_features(df=train_data_cleaned, default_val="others", verbose=False)
+test_data_cleaned = group_categorical_features(df=test_data_cleaned, default_val="others", verbose=False)
+
+## Feature Selection: Get top k=0.5 features
+print("Feature selection")
+best_feats = get_top_k_features_using_rfe(x_train=train_data_cleaned, y_train=test_data_cleaned, k=0.7, step=2, verbose=0)
+train_data_cleaned = train_data_cleaned[best_feats]
+test_data_cleaned = test_data_cleaned[best_feats]
+
+#train_data_cleaned = train_values
+#test_data_cleaned = test_values
 
 # Feature engineering: TBD
 

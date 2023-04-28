@@ -45,8 +45,9 @@ def plot_rfe_ranking(rfe: RFE):
     res = res.sort_values(by="rfe_rank")
 
     # Plot settings
-    plt.figure(figsize=(12, 15), dpi=128)
-    plt.title(f"Best Estimated Features by RFE (n_features = {rfe.n_features_} from {rfe.n_features_in_} in Total)", size=18)
-    g = sns.barplot(data=res, y="feature", x="rfe_rank", edgecolor="black", palette="Spectral")
+    plt.figure(figsize=(20, 8), dpi=128)
+    plt.title(f"Rank of Features by RFE (n_features = {rfe.n_features_} from {rfe.n_features_in_} in Total)", size=18)
+    g = sns.barplot(data=res, x="feature", y="rfe_rank", edgecolor="black", palette="Spectral")
+    plt.xticks(rotation=90)
     plt.bar_label(g.containers[0], padding=1.5)
     plt.show()

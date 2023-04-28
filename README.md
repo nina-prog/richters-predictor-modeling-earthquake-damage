@@ -1,4 +1,5 @@
 # Data Science Lab 2023: Group 5 Targaryen 
+This repository contains our project of the phase 1 of the **Practical Course: Data Science for Scientific Data** at Karlsruhe Institute of Technology (KIT). The project is about the 'Richter's Predictor: Modeling Earthquake Damage' competition ([Link](https://www.drivendata.org/competitions/57/)).
 
 ## Group Members: 
 | Forename | Surname  | Matr.#  |
@@ -28,9 +29,11 @@
 
        git clone git@git.scc.kit.edu:data-science-lab-2023/group-5-targaryen/phase-1.git
 
-2. Install the requirements:
+2. Create environment and install the requirements:
 
-       pip install -r pahse-1/requirements.txt
+       conda create -n lab_ds python==3.10.0
+       conda activate lab_ds 
+       pip install -r phase-1/requirements.txt
 
 3. Insert the data in phase-1/data/raw
 4. Navigate in the source folder and execute the pipeline with:

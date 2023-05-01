@@ -4,6 +4,9 @@ import yaml
 import pandas as pd
 
 from data_cleaning import drop_correlated_features
+from data_cleaning import group_categorical_features
+from feature_selection import get_top_k_features_using_rfe
+from feature_selection import get_top_k_features_using_mi
 import modelling
 
 
@@ -37,28 +40,40 @@ if not os.path.normpath(test_values_path):
     raise FileNotFoundError(f"{test_values_path} is missing.")
     
 # Load data
+print("Loading Data ...")
 train_values = pd.read_csv(train_values_path)
 train_labels = pd.read_csv(train_labels_path)
 test_values = pd.read_csv(test_values_path)
-train_values.set_index("building_id")
-test_values.set_index("building_id")
-
+train_values.set_index("building_id", inplace=True)
+test_values.set_index("building_id", inplace=True)
 
 # Data cleaning
-print("Data cleaning")
-#train_data_cleaned = drop_correlated_features(data=train_values, config=cfg["data_cleaning"]["correlations"])
-#test_data_cleaned = drop_correlated_features(data=test_values, config=cfg["data_cleaning"]["correlations"])
-train_data_cleaned = train_values
-test_data_cleaned = test_values
+print("Cleaning Data ...")
+train_data_cleaned = drop_correlated_features(data=train_values, config=cfg["data_cleaning"]["correlations"])
+test_data_cleaned = drop_correlated_features(data=test_values, config=cfg["data_cleaning"]["correlations"])
+
+# Group categorical features with rarely occurring realizations
+print("Grouping categorical features ...")
+train_data_cleaned = group_categorical_features(df=train_data_cleaned, default_val="others", verbose=False)
+test_data_cleaned = group_categorical_features(df=test_data_cleaned, default_val="others", verbose=False)
+
+# Feature Selection: Get top k=0.5 features using RFE, or use MI
+print("Selecting best features using RFE ...")
+best_feats, rfe = get_top_k_features_using_rfe(x_train=train_data_cleaned, y_train=test_data_cleaned, k=0.7, step=2, verbose=0)
+## Or use MI
+#print("Selecting best features using MI ...")
+#best_feats, mi_scores = get_top_k_features_using_mi(x_train=train_data_cleaned, y_train=test_data_cleaned, k=20)
+train_data_cleaned = train_data_cleaned[best_feats]
+test_data_cleaned = test_data_cleaned[best_feats]
 
 # Feature engineering: TBD
 
 
 # Model training: TBD
-print("Modelling")
+print("Modelling ...")
 model = modelling.hyperparameter_optimization(model="Dummy")
 model.fit(train_data_cleaned, train_labels)
 
 # Make prediction: TBD
-print("Make predictions")
+print("Make predictions ...")
 modelling.make_prediction(model=model, test_data=test_data_cleaned, result_path=result_path)

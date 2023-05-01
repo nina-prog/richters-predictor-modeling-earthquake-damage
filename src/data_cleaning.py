@@ -174,3 +174,98 @@ def drop_correlated_features(data=None, config=None):
             data = data.drop(features_to_drop, axis=1)
     
     return data
+
+def format_dtypes(df):
+    """
+    Formats the data types of columns in a pandas DataFrame.
+
+    :param df: pandas DataFrame to be processed
+    :type df: pandas.DataFrame
+
+    :return: pandas DataFrame with formatted data types
+    :rtype: pandas.DataFrame
+    """
+    # categorical values
+    cat_cols = df.select_dtypes(include='object').columns.tolist()
+    df[cat_cols] = df[cat_cols].astype('category')
+
+    return df
+
+def handle_outliers_IQR(df, ignore_cols, iqr_factor=1.5, method="soft_drop"):
+    """
+    Handle outliers in a mixed categorical and numerical dataframe using the IQR method. Note that this function only drops outliers based on IQR and does not consider any categorical features. It is assumed that any categorical features in the dataframe will not contribute to the detection of outliers.
+
+    :param df: The input dataframe.
+    :type df: pd.DataFrame
+    :param iqr_factor: The factor to be multiplied with the IQR to determine the outlier bounds.
+    :type iqr_factor: float, optional (default=1.5)
+    :param method: The method to handle outliers. The options are:
+        - "drop": drops the rows with outliers.
+        - "cap": replaces the outliers with the upper or lower limit.
+    :type method: str, optional (default="drop")
+    :return: The processed dataframe with outliers handled.
+    :rtype: pd.DataFrame
+    """
+    # Identify the numerical columns in the dataframe
+    df = df.drop(ignore_cols, axis=1)
+    numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
+
+    # Calculate the IQR for each numerical column
+    Q1 = df[numeric_cols].quantile(0.25)
+    Q3 = df[numeric_cols].quantile(0.75)
+    IQR = Q3 - Q1
+
+    # Calculate the lower and upper bounds for outliers
+    lower_bound = Q1 - iqr_factor * IQR
+    upper_bound = Q3 + iqr_factor * IQR
+
+    # Identify the rows where any numerical value is outside the bounds aka identify the outliers
+    outlier_mask = (df[numeric_cols] < lower_bound) | (df[numeric_cols] > upper_bound)
+    outlier_rows = outlier_mask.any(axis=1)
+
+    if method == "hard_drop":
+        # Drop rows with outliers
+        df = df[~outlier_rows]
+    elif method == "soft_drop":
+        # Compute the number of outliers per row and drop rows based on the threshold (30%)
+        count_outliers = outlier_mask.notna().sum(axis=1)
+        drop_indices = count_outliers[count_outliers >= 30 * len(numeric_cols)].index
+        df = df.drop(drop_indices)
+    elif method == "replace":
+        upper_limit = df[numeric_cols].mean() + 3 * df[numeric_cols].std()
+        lower_limit = df[numeric_cols].mean() - 3 * df[numeric_cols].std()
+        # Replace outliers with upper or lower limit
+        df[numeric_cols] = np.where(df[numeric_cols] > upper_limit, upper_limit,
+                                    np.where(df[numeric_cols] < lower_limit, lower_limit,
+                                             df[numeric_cols]))
+    else:
+        raise ValueError(f"Invalid method: {method}, must be either 'drop' or 'replace'.")
+
+    return df
+
+def clean_data(df, config, ignore_cols, outlier_method):
+    """
+    Cleans the input pandas DataFrame by dropping unnecessary columns, formatting column data types, and handling outliers.
+
+    :param df: pandas DataFrame to be processed
+    :type df: pandas.DataFrame
+    :param config: configparser object containing configuration settings
+    :type config: configparser.ConfigParser
+    :param ignore_cols: list of column names to ignore when handling outliers (default: None)
+    :type ignore_cols: list or None
+    :param outlier_method: The method to handle outliers. The options are:
+        - "drop": drops the rows with outliers.
+        - "cap": replaces the outliers with the upper or lower limit.
+    :type outlier_method: str
+    :return: cleaned pandas DataFrame
+    :rtype: pandas.DataFrame
+    """
+    # Drop unnecessary columns
+    drop_cols = config.get("data_cleaning", "NO DATA CLEANING DEFINED").get("columns_to_remove")
+    df = df.drop(drop_cols, axis=1)
+    # Format column types
+    df = format_dtypes(df)
+    # Handle outliers
+    df = handle_outliers_IQR(df, ignore_cols=ignore_cols, method=outlier_method)
+
+    return df

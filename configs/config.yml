@@ -12,6 +12,13 @@ data_cleaning:
                         'has_secondary_use_gov_office',
                         'has_secondary_use_use_police',
                         'has_secondary_use_other']
+    columns_to_ignore: ["building_id",
+                        "geo_level_1_id",
+                        "geo_level_2_id",
+                        "geo_level_3_id",
+                        "damage_grade",
+                        "count_floors_pre_eq",
+                        "count_families"]
     correlations: 
         - feature_names: ["geo_level_1_id", "geo_level_2_id", "geo_level_3_id", "count_floors_pre_eq", "age", "area_percentage", "height_percentage", "count_families"]
           threshold: 0.7

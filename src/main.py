@@ -72,12 +72,12 @@ test_data_cleaned = group_categorical_features(df=test_data_cleaned, default_val
 
 # Feature Selection: Get top k=0.5 features using RFE, or use MI
 print("Selecting best features using RFE ...")
-best_feats, rfe = get_top_k_features_using_rfe(x_train=train_data_cleaned, y_train=test_data_cleaned, k=0.7, step=2, verbose=0)
+best_feats, rfe = get_top_k_features_using_rfe(x_train=train_data_cleaned, y_train=train_labels, k=0.8, step=10, verbose=1)
 ## Or use MI
 #print("Selecting best features using MI ...")
 #best_feats, mi_scores = get_top_k_features_using_mi(x_train=train_data_cleaned, y_train=test_data_cleaned, k=20)
-train_data_cleaned = train_data_cleaned[best_feats]
-test_data_cleaned = test_data_cleaned[best_feats]
+train_data_cleaned = train_data_cleaned[train_data_cleaned.columns.intersection(best_feats)]
+test_data_cleaned = test_data_cleaned[test_data_cleaned.columns.intersection(best_feats)]
 
 # Feature engineering: TBD
 

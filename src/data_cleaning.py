@@ -165,12 +165,13 @@ def drop_correlated_features(data=None, config=None):
     # Traverse all dicts in the config
     # Note: This could be parallelized
     for d in config:
+        feature_names = [x for x in data.columns if x in d['feature_names']]
         if d['method'] == 'MCC':
-            features_to_drop = get_mcc_correlated_features(data=data[d['feature_names']], threshold=d['threshold'])
+            features_to_drop = get_mcc_correlated_features(data=data[feature_names], threshold=d['threshold'])
         elif d['method'] == 'CramersV':
-            features_to_drop = get_cramers_v_correlated_features(data=data[d['feature_names']], threshold=d['threshold'])
+            features_to_drop = get_cramers_v_correlated_features(data=data[feature_names], threshold=d['threshold'])
         elif d['method'] == 'Pearson':
-            features_to_drop = get_pearson_correlated_features(data=data[d['feature_names']], threshold=d['threshold'])
+            features_to_drop = get_pearson_correlated_features(data=data[feature_names], threshold=d['threshold'])
         else: 
             print(f"Correlation method '{d['method']}' is not implemented.")
         

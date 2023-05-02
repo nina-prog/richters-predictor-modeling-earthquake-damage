@@ -23,6 +23,7 @@ def get_top_k_features_using_rfe(x_train: pd.DataFrame, y_train: pd.DataFrame, k
 
     # Define classifier
     clf = RandomForestClassifier()
+    x_train = pd.get_dummies(x_train)
     rfe = RFE(estimator=clf, n_features_to_select=k, step=step, verbose=verbose)
     rfe.fit(x_train, y_train["damage_grade"].values.flatten())
 

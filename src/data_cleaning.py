@@ -241,10 +241,10 @@ def handle_outliers_IQR(df, ignore_cols, iqr_factor=1.5, method="replace"):
     outlier_mask = (tmp < lower_bound) | (tmp > upper_bound)
     outlier_rows = outlier_mask.any(axis=1)
 
-    print(
-        f"Found {outlier_mask.sum().sum()} outliers,using method'{method}'to handle them:" + "\n" + "#" * 10 +
-        "Count per column:" + "#" * 10 + "\n" + f"{outlier_mask.sum()}"
-    )
+    print(f"Found {outlier_mask.sum().sum()} outliers,using method'{method}'to handle them:" + "\n" + "#" * 10)
+    print(f"Count per column: {outlier_mask.sum().to_dict()}")
+    print(f"Lower bound: {lower_bound.to_dict()}")
+    print(f"Upper bound: {upper_bound.to_dict()}")
 
     if method == "hard_drop":
         # Drop rows with outliers

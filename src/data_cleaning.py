@@ -3,11 +3,13 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import matthews_corrcoef
 from sklearn import preprocessing
+from scipy.stats import chi2_contingency
 
 
 def get_pearson_correlated_features(data=None, threshold=0.7):
     """
-    Calculates the pearson correlation of all features in the dataframe and returns a set of features with a correlation greater than the threshold. 
+    Calculates the pearson correlation of all features in the dataframe and returns a set of features with a
+    correlation greater than the threshold.
     
     :param data: Dataframe with features and values
     :param threshold: A number between 0 and 1
@@ -30,10 +32,12 @@ def get_pearson_correlated_features(data=None, threshold=0.7):
 
 def get_cramers_v_correlated_features(data=None, threshold=0.7):
     """
-    Calculates the cramers V correlation of all features and returns a set of features with a correlation greater than the threshold. 
-    Cramers V is based on Chi square, for reference see: https://en.wikipedia.org/wiki/Cram%C3%A9r%27s_V
+    Calculates the cramers V correlation of all features and returns a set of features with a correlation greater
+    than the threshold. Cramers V is based on Chi square, for reference
+    see: https://en.wikipedia.org/wiki/Cram%C3%A9r%27s_V
     Note that this function is desined to work for categorical features only!
-    Code was copied and modified from this source: https://www.kaggle.com/code/chrisbss1/cramer-s-v-correlation-matrix/notebook
+    Code was copied and modified from this source:
+    https://www.kaggle.com/code/chrisbss1/cramer-s-v-correlation-matrix/notebook
     
     :param data: Dataframe with features and values
     :param threshold: A number between 0 and 1
@@ -82,10 +86,11 @@ def get_cramers_v_correlated_features(data=None, threshold=0.7):
 
 def get_mcc_correlated_features(data=None, threshold=0.7):
     """
-    Calculates the MCC correlation of all features and returns a set of features with a correlation greater than the threshold. 
-    Cramers V is based on Chi square, for reference see: https://en.wikipedia.org/wiki/Cram%C3%A9r%27s_V
+    Calculates the MCC correlation of all features and returns a set of features with a correlation greater than
+    the threshold. Cramers V is based on Chi square, for reference see: https://en.wikipedia.org/wiki/Cram%C3%A9r%27s_V
     Note that this function is desined to work for categorical features only!
-    Code was copied and modified from this source: https://www.kaggle.com/code/chrisbss1/cramer-s-v-correlation-matrix/notebook
+    Code was copied and modified from this source:
+    https://www.kaggle.com/code/chrisbss1/cramer-s-v-correlation-matrix/notebook
     
     :param data: Dataframe with features and values
     :param threshold: A number between 0 and 1
@@ -191,9 +196,11 @@ def format_dtypes(df):
 
     return df
 
-def handle_outliers_IQR(df, ignore_cols, iqr_factor=1.5, method="soft_drop"):
+def handle_outliers_IQR(df, ignore_cols, iqr_factor=1.5, method="replace"):
     """
-    Handle outliers in a mixed categorical and numerical dataframe using the IQR method. Note that this function only drops outliers based on IQR and does not consider any categorical features. It is assumed that any categorical features in the dataframe will not contribute to the detection of outliers.
+    Handle outliers in a mixed categorical and numerical dataframe using the IQR method. Note that this function
+    only drops outliers based on IQR and does not consider any categorical features. It is assumed that any categorical
+    features in the dataframe will not contribute to the detection of outliers.
 
     :param df: The input dataframe.
     :type df: pd.DataFrame
@@ -223,6 +230,8 @@ def handle_outliers_IQR(df, ignore_cols, iqr_factor=1.5, method="soft_drop"):
     outlier_mask = (df[numeric_cols] < lower_bound) | (df[numeric_cols] > upper_bound)
     outlier_rows = outlier_mask.any(axis=1)
 
+    print(f"Found {outlier_mask.count().sum()} outliers, method '{method}'")
+
     if method == "hard_drop":
         # Drop rows with outliers
         df = df[~outlier_rows]
@@ -243,9 +252,10 @@ def handle_outliers_IQR(df, ignore_cols, iqr_factor=1.5, method="soft_drop"):
 
     return df
 
-def clean_data(df, config, ignore_cols, outlier_method):
+def prepare_data(df, config, ignore_cols, outlier_method):
     """
-    Cleans the input pandas DataFrame by dropping unnecessary columns, formatting column data types, and handling outliers.
+    Cleans the input pandas DataFrame by dropping unnecessary columns, formatting column data types,
+    and handling outliers.
 
     :param df: pandas DataFrame to be processed
     :type df: pandas.DataFrame
@@ -284,7 +294,7 @@ def group_categorical_features(df: pd.DataFrame, default_val: str = "others", ve
     :return: DataFrame with the column replaced with the mapped column
     """
 
-    # Define mapping for each feature with rarely occuring categorical values
+    # Define mapping for each feature with rarely occurring categorical values
     mapping_plan_configuration = {"col": "plan_configuration",
                                   "mapping": {"d": "d"}}
     mapping_legal_ownership_status = {"col": "legal_ownership_status",

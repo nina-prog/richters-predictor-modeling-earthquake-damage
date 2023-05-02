@@ -5,6 +5,7 @@ import pandas as pd
 
 from data_cleaning import drop_correlated_features
 from data_cleaning import group_categorical_features
+from data_cleaning import  prepare_data
 from feature_selection import get_top_k_features_using_rfe
 from feature_selection import get_top_k_features_using_mi
 import modelling
@@ -49,6 +50,14 @@ test_values.set_index("building_id", inplace=True)
 
 # Data cleaning
 print("Cleaning Data ...")
+binary_encoded_cols = [x for x in train_values.columns if x.startswith("has_")]
+columns_to_ignore = cfg.get("data_cleaning", "NO DATA CLEANING DEFINED!").get("columns_to_remove")
+train_data_cleaned = prepare_data(df=train_values, config=cfg,
+                                  ignore_cols=columns_to_ignore+binary_encoded_cols,
+                                  outlier_method="replace")
+test_data_cleaned = prepare_data(df=test_values, config=cfg,
+                                  ignore_cols=columns_to_ignore+binary_encoded_cols,
+                                  outlier_method="replace")
 train_data_cleaned = drop_correlated_features(data=train_values, config=cfg["data_cleaning"]["correlations"])
 test_data_cleaned = drop_correlated_features(data=test_values, config=cfg["data_cleaning"]["correlations"])
 

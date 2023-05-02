@@ -13,7 +13,8 @@ This repository contains our project of the phase 1 of the **Practical Course: D
 📦phase-1
  ┣ 📂config                  <-- Configuration files for the pipeline
  ┣ 📂data                    <-- Data used as input during development with Jupyter notebooks. 
- ┃ ┗ 📂raw                   <-- Contains the raw data provided by the supervisors.
+ ┃ ┣ 📂raw                   <-- Contains the raw data provided by the supervisors.
+ ┃ ┗ 📂processed             <-- Contains the processed data build during development.
  ┣ 📂models                  <-- Saved models during Development.
  ┣ 📂notebooks               <-- Jupyter Notebooks used in development.
  ┃ ┗ 📂weekXX                <-- Contains the weekly subtasks.
@@ -39,4 +40,4 @@ This repository contains our project of the phase 1 of the **Practical Course: D
 4. Navigate in the source folder and execute the pipeline with:
 
        cd phase-1/src
-       python main.py --config "../configs/sample_config.yml"
+       python main.py --config "../configs/config.yml"

@@ -49,6 +49,7 @@ train_values.set_index("building_id", inplace=True)
 test_values.set_index("building_id", inplace=True)
 
 # Data cleaning
+# Prepare raw data
 print("Cleaning Data ...")
 binary_encoded_cols = [x for x in train_values.columns if x.startswith("has_")]
 columns_to_ignore = cfg.get("data_cleaning", "NO DATA CLEANING DEFINED!").get("columns_to_remove")
@@ -58,8 +59,11 @@ train_data_cleaned = prepare_data(df=train_values, config=cfg,
 test_data_cleaned = prepare_data(df=test_values, config=cfg,
                                   ignore_cols=columns_to_ignore+binary_encoded_cols,
                                   outlier_method="replace")
-train_data_cleaned = drop_correlated_features(data=train_values, config=cfg["data_cleaning"]["correlations"])
-test_data_cleaned = drop_correlated_features(data=test_values, config=cfg["data_cleaning"]["correlations"])
+
+# Correlated features
+print("Drop correlated features...")
+train_data_cleaned = drop_correlated_features(data=train_data_cleaned, config=cfg["data_cleaning"]["correlations"])
+test_data_cleaned = drop_correlated_features(data=test_data_cleaned, config=cfg["data_cleaning"]["correlations"])
 
 # Group categorical features with rarely occurring realizations
 print("Grouping categorical features ...")

@@ -12,7 +12,7 @@ import modelling
 
 
 # Parse config
-print("Parse config")
+print("Parse Config ...")
 parser=argparse.ArgumentParser()
 parser.add_argument("--config", help="Path to the config file")
 args=parser.parse_args()
@@ -27,7 +27,7 @@ with open(args.config, "r") as ymlfile:
 
 # ToDo: Verify options of config (in the end, when all valid options are known)
 # Check if data in config exists and read it
-print("Read and load data")
+print("Read and Load Data ...")
 train_values_path = cfg["paths"]["train_values"]
 train_labels_path = cfg["paths"]["train_labels"]
 test_values_path = cfg["paths"]["test_values"]
@@ -71,15 +71,17 @@ print("Grouping categorical features ...")
 train_data_cleaned = group_categorical_features(df=train_data_cleaned, default_val="others", verbose=False)
 test_data_cleaned = group_categorical_features(df=test_data_cleaned, default_val="others", verbose=False)
 
-# Feature Selection: Get top k=0.5 features using RFE, or use MI
-print("Selecting best features using RFE ...")
+# Feature Selection: Get top k features using RFE, RFECV, or use MI
+print("Selecting best features using RFE CV ...")
 best_feats, rfecv = get_top_k_features_using_rfe_cv(x_train=train_data_cleaned,
                                                          y_train=train_labels,
-                                                         min_features_to_select=30,
+                                                         min_features_to_select=5,
                                                          k_folds=5,
                                                          scoring="matthews_corrcoef",
                                                          step=2,
                                                          verbose=0)
+#plot_rfecv_scoring(rfecv)
+print(f"*** Number of best selected features: {rfecv.n_features_} of {rfecv.n_features_in_} in total ***")
 # Keep best columns
 train_data_cleaned = train_data_cleaned[train_data_cleaned.columns.intersection(best_feats)]
 test_data_cleaned = test_data_cleaned[test_data_cleaned.columns.intersection(best_feats)]

@@ -1,6 +1,7 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import RFE, RFECV
 from sklearn.feature_selection import mutual_info_classif
@@ -166,13 +167,19 @@ def plot_rfecv_scoring(rfecv):
     plt.figure(figsize=(12,5))
     stepsize = get_step_sizes(rfecv)
     sns.lineplot(x=stepsize, y=rfecv.cv_results_["mean_test_score"])
+    max_y = np.max(rfecv.cv_results_["mean_test_score"])
+    min_y = np.min(rfecv.cv_results_["mean_test_score"])
     # Plot errorbars
     plt.errorbar(x=stepsize,
                  y=rfecv.cv_results_["mean_test_score"],
                  yerr=rfecv.cv_results_["std_test_score"],
-                 fmt='o', color='red', alpha=0.5)
+                 fmt='o', color='red', alpha=0.5, label="SD")
+    plt.axhline(y=max_y, color="green", linestyle="--", alpha=0.5, label=f"max = {max_y:.4f}")
+    plt.axhline(y=min_y, color="grey", linestyle="--", alpha=0.5, label=f"min = {min_y:.4f}")
     plt.xticks(stepsize)
-    plt.title("Recursive Feature Elimination CV", size=16)
+    plt.title(f"Recursive Feature Elimination with CV\n"+
+              f"(best n_features = {rfecv.n_features_} of {rfecv.n_features_in_} in total)", size=16)
     plt.xlabel("Number of Features Selected")
     plt.ylabel("Mean Test MCC")
+    plt.legend()
     plt.show()

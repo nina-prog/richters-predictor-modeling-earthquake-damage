@@ -2,8 +2,9 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.feature_selection import RFE
+from sklearn.feature_selection import RFE, RFECV
 from sklearn.feature_selection import mutual_info_classif
+from sklearn.model_selection import StratifiedKFold
 
 
 def get_top_k_features_using_rfe(x_train: pd.DataFrame, y_train: pd.DataFrame, k = 0.50, step: int = 2, verbose: int = 0):
@@ -32,6 +33,42 @@ def get_top_k_features_using_rfe(x_train: pd.DataFrame, y_train: pd.DataFrame, k
     best_k_features = ranking[ranking["rfe_support"] == True]["feature"].to_list()
 
     return best_k_features, rfe
+
+def get_top_k_features_using_rfe_cv(x_train: pd.DataFrame,
+                                    y_train: pd.DataFrame,
+                                    min_features_to_select=20,
+                                    k_folds=5, scoring="matthews_corrcoef",
+                                    step=2, verbose=0):
+    """
+    Applies Recursive Feature Elimination RFE with cross validation. As the estimator and thus the scoring, we use
+    RandomForests respectively feauture_importance. CV is used via StratifiedKFold since we got an imbalanced target.
+
+    :param x_train: DataFrame of the training data
+    :param y_train: Dataframe of the labels
+    :param min_features_to_select: Minimum number of features to keep
+    :param k_folds: Number of folds in each CV
+    :param scoring: Scoring metric, e.g. 'accuracy' (default is MCC)
+    :param step: Step size of the RFE
+    :param verbose: Verbosity level
+    :return: List of k top features and fitted RFECV Object
+    """
+
+    # Define classifier
+    clf = RandomForestClassifier()
+    rfecv = RFECV(estimator=clf,
+                  min_features_to_select=min_features_to_select,
+                  cv=StratifiedKFold(k_folds),
+                  scoring=scoring,
+                  step=step,
+                  n_jobs=-1,
+                  verbose=verbose)
+    rfecv.fit(x_train, y_train["damage_grade"].values.flatten())
+
+    # Select feature name that are estimated to be the best features
+    ranking = pd.DataFrame({"feature": x_train.columns, "rfecv_support": rfecv.support_})
+    best_k_features = ranking[ranking["rfecv_support"] == True]["feature"].to_list()
+
+    return best_k_features, rfecv
 
 
 def plot_rfe_ranking(rfe: RFE):

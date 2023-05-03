@@ -50,12 +50,13 @@ test_values.set_index("building_id", inplace=True)
 
 # Data cleaning
 # Prepare raw data
-print("Cleaning Data ...")
+print("Cleaning Train Data ...")
 binary_encoded_cols = [x for x in train_values.columns if x.startswith("has_")]
-columns_to_ignore = cfg.get("data_cleaning", "NO DATA CLEANING DEFINED!").get("columns_to_remove")
+columns_to_ignore = cfg.get("data_cleaning", "NO DATA CLEANING DEFINED!").get("columns_to_ignore")
 train_data_cleaned = prepare_data(df=train_values, config=cfg,
                                   ignore_cols=columns_to_ignore+binary_encoded_cols,
                                   outlier_method="replace")
+print("Cleaning Test Data ...")
 test_data_cleaned = prepare_data(df=test_values, config=cfg,
                                   ignore_cols=columns_to_ignore+binary_encoded_cols,
                                   outlier_method="replace")

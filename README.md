@@ -39,5 +39,5 @@ This repository contains our project of the phase 1 of the **Practical Course: D
 3. Insert the data in phase-1/data/raw
 4. Navigate in the source folder and execute the pipeline with:
 
-       cd phase-1/src
-       python main.py --config "../configs/config.yml"
+       cd phase-1
+       python src/main.py --config "configs/config.yml"

@@ -34,6 +34,7 @@ def get_top_k_features_using_rfe(x_train: pd.DataFrame, y_train: pd.DataFrame, k
 
     return best_k_features, rfe
 
+
 def get_top_k_features_using_rfe_cv(x_train: pd.DataFrame,
                                     y_train: pd.DataFrame,
                                     min_features_to_select=20,
@@ -55,6 +56,7 @@ def get_top_k_features_using_rfe_cv(x_train: pd.DataFrame,
 
     # Define classifier
     clf = RandomForestClassifier()
+    x_train = pd.get_dummies(x_train) # TODO: Do this later in Feature Engineering Part
     rfecv = RFECV(estimator=clf,
                   min_features_to_select=min_features_to_select,
                   cv=StratifiedKFold(k_folds),
@@ -127,4 +129,50 @@ def plot_mi_ranking(mi_scores):
     plt.title("Mutual Information Scores Ordered Descending", size=24)
     g = sns.barplot(x=mi_scores.keys(), y=mi_scores.values, palette="Spectral", edgecolor="black")
     plt.xticks(rotation=90)
+    plt.show()
+
+
+def get_step_sizes(rfecv):
+    """
+    Helper function to get the number of features in each step from the RFECV.
+
+    :param rfecv: Fitted RFECV object
+    :return: List of number of features analysed
+    """
+    minfeat = rfecv.min_features_to_select
+    startfeat = rfecv.n_features_in_
+    step = rfecv.step
+
+    res = []
+    res.append(startfeat)
+
+    while startfeat > minfeat:
+        startfeat = startfeat - step
+        res.append(startfeat)
+
+    res.pop()
+    res.append(minfeat)
+
+    return list(set(res))
+
+
+def plot_rfecv_scoring(rfecv):
+    """
+    Plots the Mean Test Scoring Value (MCC) of the steps of the RFECV.
+
+    :param rfecv: Fitted RFECV object
+    :return: None
+    """
+    plt.figure(figsize=(12,5))
+    stepsize = get_step_sizes(rfecv)
+    sns.lineplot(x=stepsize, y=rfecv.cv_results_["mean_test_score"])
+    # Plot errorbars
+    plt.errorbar(x=stepsize,
+                 y=rfecv.cv_results_["mean_test_score"],
+                 yerr=rfecv.cv_results_["std_test_score"],
+                 fmt='o', color='red', alpha=0.5)
+    plt.xticks(stepsize)
+    plt.title("Recursive Feature Elimination CV", size=16)
+    plt.xlabel("Number of Features Selected")
+    plt.ylabel("Mean Test MCC")
     plt.show()

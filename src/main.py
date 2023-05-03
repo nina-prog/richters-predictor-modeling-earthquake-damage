@@ -6,7 +6,7 @@ import pandas as pd
 from data_cleaning import drop_correlated_features
 from data_cleaning import group_categorical_features
 from data_cleaning import  prepare_data
-from feature_selection import get_top_k_features_using_rfe
+from feature_selection import get_top_k_features_using_rfe_cv, plot_rfecv_scoring
 from feature_selection import get_top_k_features_using_mi
 import modelling
 
@@ -72,10 +72,14 @@ test_data_cleaned = group_categorical_features(df=test_data_cleaned, default_val
 
 # Feature Selection: Get top k=0.5 features using RFE, or use MI
 print("Selecting best features using RFE ...")
-best_feats, rfe = get_top_k_features_using_rfe(x_train=train_data_cleaned, y_train=train_labels, k=0.8, step=10, verbose=1)
-## Or use MI
-#print("Selecting best features using MI ...")
-#best_feats, mi_scores = get_top_k_features_using_mi(x_train=train_data_cleaned, y_train=test_data_cleaned, k=20)
+best_feats, rfecv = get_top_k_features_using_rfe_cv(x_train=train_data_cleaned,
+                                                         y_train=train_labels,
+                                                         min_features_to_select=30,
+                                                         k_folds=5,
+                                                         scoring="matthews_corrcoef",
+                                                         step=2,
+                                                         verbose=0)
+# Keep best columns
 train_data_cleaned = train_data_cleaned[train_data_cleaned.columns.intersection(best_feats)]
 test_data_cleaned = test_data_cleaned[test_data_cleaned.columns.intersection(best_feats)]
 

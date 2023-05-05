@@ -17,8 +17,8 @@ This repository contains our project of the phase 1 of the **Practical Course: D
  ┃ ┗ 📂processed             <-- Contains the processed data build during development.
  ┣ 📂models                  <-- Saved models during Development.
  ┣ 📂notebooks               <-- Jupyter Notebooks used in development.
- ┃ ┗ 📂weekXX                <-- Contains the weekly subtasks.
- ┣ 📂src                     <-- The customized project packages containing all utility functions and source codes.
+ ┃ ┗ 📂weekXX                <-- Contains the notebooks for weekly subtasks and experimenting.
+ ┣ 📂src                     <-- Source code.
  ┣ 📜.gitignore 
  ┣ 📜README.md               <-- The top-level README for developers using this project. 
  ┗ 📜requirements.txt        <-- The requirenments file for reproducing the environment, e.g. generated with 
@@ -37,7 +37,7 @@ This repository contains our project of the phase 1 of the **Practical Course: D
        pip install -r phase-1/requirements.txt
 
 3. Insert the data in phase-1/data/raw
-4. Navigate in the source folder and execute the pipeline with:
+4. Navigate into project root and execute the pipeline with:
 
        cd phase-1
        python src/main.py --config "configs/config.yml"

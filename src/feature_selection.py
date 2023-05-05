@@ -58,7 +58,7 @@ def get_top_k_features_using_rfe_cv(x_train: pd.DataFrame,
     clf = RandomForestClassifier(random_state=42)
     rfecv = RFECV(estimator=clf,
                   min_features_to_select=min_features_to_select,
-                  cv=StratifiedKFold(k_folds, random_state=42),
+                  cv=StratifiedKFold(k_folds, random_state=42, shuffle=True),
                   scoring=scoring,
                   step=step,
                   n_jobs=-1,

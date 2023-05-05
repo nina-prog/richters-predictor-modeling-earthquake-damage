@@ -10,6 +10,7 @@ from feature_selection import get_top_k_features_using_rfe_cv, plot_rfecv_scorin
 from feature_selection import get_top_k_features_using_mi
 from feature_engineering import encode_train_data, encode_test_data
 from feature_engineering import normalize_train_data, normalize_test_data
+from feature_engineering import get_quality_of_superstructure, get_risk_status_based_on_geo_level
 import modelling
 
 
@@ -51,9 +52,9 @@ train_values.set_index("building_id", inplace=True)
 test_values.set_index("building_id", inplace=True)
 
 # Make Sample Size smaller for experimenting and testing; Keep commented!
-#train_values = train_values.iloc[:7000]
-#test_values = test_values.iloc[:7000]
-#train_labels = train_labels.iloc[:7000]
+train_values = train_values.iloc[:7000]
+test_values = test_values.iloc[:7000]
+train_labels = train_labels.iloc[:7000]
 
 # Data cleaning
 # Prepare raw data
@@ -77,6 +78,11 @@ test_data_cleaned = drop_correlated_features(data=test_data_cleaned, config=cfg[
 print("Grouping categorical features ...")
 train_data_cleaned = group_categorical_features(df=train_data_cleaned, default_val="others", verbose=False)
 test_data_cleaned = group_categorical_features(df=test_data_cleaned, default_val="others", verbose=False)
+
+# Add new features for risk status
+print("Add risk status feature")
+test_data_cleaned = get_risk_status_based_on_geo_level(data=train_values, df_to_add_info=test_data_cleaned, labels=train_labels, geo_level=1)
+train_data_cleaned = get_risk_status_based_on_geo_level(data=train_values, df_to_add_info=train_data_cleaned, labels=train_labels, geo_level=1)
 
 # Apply One Hot Encoding on categorical features
 print("One Hot Encoding features ...")

@@ -24,8 +24,7 @@ def get_top_k_features_using_rfe(x_train: pd.DataFrame, y_train: pd.DataFrame, k
     """
 
     # Define classifier
-    clf = RandomForestClassifier()
-    x_train = pd.get_dummies(x_train)
+    clf = RandomForestClassifier(random_state=42)
     rfe = RFE(estimator=clf, n_features_to_select=k, step=step, verbose=verbose)
     rfe.fit(x_train, y_train["damage_grade"].values.flatten())
 
@@ -56,11 +55,10 @@ def get_top_k_features_using_rfe_cv(x_train: pd.DataFrame,
     """
 
     # Define classifier
-    clf = RandomForestClassifier()
-    x_train = pd.get_dummies(x_train) # TODO: Do this later in Feature Engineering Part
+    clf = RandomForestClassifier(random_state=42)
     rfecv = RFECV(estimator=clf,
                   min_features_to_select=min_features_to_select,
-                  cv=StratifiedKFold(k_folds),
+                  cv=StratifiedKFold(k_folds, random_state=42),
                   scoring=scoring,
                   step=step,
                   n_jobs=-1,

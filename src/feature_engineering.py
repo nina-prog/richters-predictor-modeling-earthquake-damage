@@ -78,7 +78,7 @@ def normalize_train_data(x_train: pd.DataFrame, method: str = "standard"):
 
     x_train_scaled = scaler.fit_transform(x_train)
     # Transform back to pandas DataFrame
-    x_train_scaled = pd.DataFrame(x_train_scaled, columns=x_train.columns)
+    x_train_scaled = pd.DataFrame(x_train_scaled, columns=x_train.columns, index=x_train.index)
     return x_train_scaled, scaler
 
 
@@ -94,5 +94,5 @@ def normalize_test_data(x_test: pd.DataFrame, scaler) -> pd.DataFrame:
 
     x_test_scaled = scaler.transform(x_test)
     # Transform back to pandas DataFrame
-    x_test_scaled = pd.DataFrame(x_test_scaled, columns=x_test.columns)
+    x_test_scaled = pd.DataFrame(x_test_scaled, columns=x_test.columns, index=x_test.index)
     return x_test_scaled

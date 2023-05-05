@@ -8,6 +8,8 @@ from data_cleaning import group_categorical_features
 from data_cleaning import  prepare_data
 from feature_selection import get_top_k_features_using_rfe_cv, plot_rfecv_scoring
 from feature_selection import get_top_k_features_using_mi
+from feature_engineering import encode_train_data, encode_test_data
+from feature_engineering import normalize_train_data, normalize_test_data
 import modelling
 
 
@@ -48,6 +50,11 @@ test_values = pd.read_csv(test_values_path)
 train_values.set_index("building_id", inplace=True)
 test_values.set_index("building_id", inplace=True)
 
+# Make Sample Size smaller for experimenting and testing; Keep commented!
+#train_values = train_values.iloc[:7000]
+#test_values = test_values.iloc[:7000]
+#train_labels = train_labels.iloc[:7000]
+
 # Data cleaning
 # Prepare raw data
 print("Cleaning Train Data ...")
@@ -71,23 +78,31 @@ print("Grouping categorical features ...")
 train_data_cleaned = group_categorical_features(df=train_data_cleaned, default_val="others", verbose=False)
 test_data_cleaned = group_categorical_features(df=test_data_cleaned, default_val="others", verbose=False)
 
+# Apply One Hot Encoding on categorical features
+print("One Hot Encoding features ...")
+train_data_cleaned, ohe = encode_train_data(x_train=train_data_cleaned)
+test_data_cleaned = encode_test_data(x_test=test_data_cleaned, ohe=ohe)
+
+# Apply StandardScaler (method="standard") or MinMax Scaler (method="minmax") on Features
+print("Normalizing Data ...")
+train_data_cleaned, scaler = normalize_train_data(x_train=train_data_cleaned, method="minmax")
+test_data_cleaned = normalize_test_data(x_test=test_data_cleaned, scaler=scaler)
+
 # Feature Selection: Get top k features using RFE, RFECV, or use MI
 print("Selecting best features using RFE CV ...")
 best_feats, rfecv = get_top_k_features_using_rfe_cv(x_train=train_data_cleaned,
-                                                         y_train=train_labels,
-                                                         min_features_to_select=5,
-                                                         k_folds=5,
-                                                         scoring="matthews_corrcoef",
-                                                         step=2,
-                                                         verbose=0)
+                                                    y_train=train_labels,
+                                                    min_features_to_select=5,
+                                                    k_folds=5,
+                                                    scoring="matthews_corrcoef",
+                                                    step=2,
+                                                    verbose=0)
 #plot_rfecv_scoring(rfecv)
 print(f"*** Number of best selected features: {rfecv.n_features_} of {rfecv.n_features_in_} in total ***")
+
 # Keep best columns
 train_data_cleaned = train_data_cleaned[train_data_cleaned.columns.intersection(best_feats)]
 test_data_cleaned = test_data_cleaned[test_data_cleaned.columns.intersection(best_feats)]
-
-# Feature engineering: TBD
-
 
 # Model training: TBD
 print("Modelling ...")

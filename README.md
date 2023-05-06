@@ -26,18 +26,16 @@ This repository contains our project of the phase 1 of the **Practical Course: D
 ```
 
 ## Setting up the environment and run the code
-1. Clone the repository with:  
+1. Clone the repository with:
 
-       git clone git@git.scc.kit.edu:data-science-lab-2023/group-5-targaryen/phase-1.git
+       git clone https://git.scc.kit.edu/data-science-lab-2023/group-5-targaryen/phase-1.git
 
-2. Create environment and install the requirements:
+2. Install the requirements:
 
-       conda create -n lab_ds python==3.10.0
-       conda activate lab_ds 
        pip install -r phase-1/requirements.txt
 
 3. Insert the data in phase-1/data/raw
 4. Navigate into project root and execute the pipeline with:
 
        cd phase-1
-       python src/main.py --config "configs/config.yml"
+       python3 src/main.py --config "configs/config.yml"

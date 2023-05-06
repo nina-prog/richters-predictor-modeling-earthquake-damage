@@ -1,10 +1,15 @@
 from sklearn.dummy import DummyClassifier
+from sklearn.ensemble import RandomForestClassifier
 
 
 def hyperparameter_optimization(model=None, hyperparameter_grid=None, train_data=None, train_labels=None):
     if model == "Dummy":
         model = DummyClassifier(strategy="most_frequent")
-    
+
+    # TODO: Delete this later in week 04 subtasks
+    print("Using RandomForest ...")
+    model = RandomForestClassifier(random_state=42)
+
     return model
 
 

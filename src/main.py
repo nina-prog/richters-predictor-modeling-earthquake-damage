@@ -10,6 +10,7 @@ from feature_selection import get_top_k_features_using_rfe_cv, plot_rfecv_scorin
 from feature_selection import get_top_k_features_using_mi
 from feature_engineering import encode_train_data, encode_test_data
 from feature_engineering import normalize_train_data, normalize_test_data
+from feature_engineering import get_quality_of_superstructure, get_risk_status_based_on_geo_level
 import modelling
 
 
@@ -51,9 +52,9 @@ train_values.set_index("building_id", inplace=True)
 test_values.set_index("building_id", inplace=True)
 
 # Make Sample Size smaller for experimenting and testing; Keep commented!
-#train_values = train_values.iloc[:7000]
-#test_values = test_values.iloc[:7000]
-#train_labels = train_labels.iloc[:7000]
+train_values = train_values.iloc[:7000]
+test_values = test_values.iloc[:7000]
+train_labels = train_labels.iloc[:7000]
 
 # Data cleaning
 # Prepare raw data
@@ -74,31 +75,50 @@ train_data_cleaned = drop_correlated_features(data=train_data_cleaned, config=cf
 test_data_cleaned = drop_correlated_features(data=test_data_cleaned, config=cfg["data_cleaning"]["correlations"])
 
 # Group categorical features with rarely occurring realizations
-print("Grouping categorical features ...")
-train_data_cleaned = group_categorical_features(df=train_data_cleaned, default_val="others", verbose=False)
-test_data_cleaned = group_categorical_features(df=test_data_cleaned, default_val="others", verbose=False)
+if not cfg["feature_engineering"]["group_categorical"]["skip"]:
+    print("Grouping categorical features ...")
+    train_data_cleaned = group_categorical_features(df=train_data_cleaned, default_val="others", verbose=False)
+    test_data_cleaned = group_categorical_features(df=test_data_cleaned, default_val="others", verbose=False)
+
+# Add new features for risk status
+if not cfg["feature_engineering"]["risk_status"]["skip"]:
+    print("Add risk status features...")
+    test_data_cleaned = get_risk_status_based_on_geo_level(data=train_values, df_to_add_info=test_data_cleaned, labels=train_labels, geo_level=cfg["feature_engineering"]["risk_status"]["geo_level"])
+    train_data_cleaned = get_risk_status_based_on_geo_level(data=train_values, df_to_add_info=train_data_cleaned, labels=train_labels, geo_level=cfg["feature_engineering"]["risk_status"]["geo_level"])
+
+# Add superstructure quality
+if not cfg["feature_engineering"]["superstructure_quality"]["skip"]:
+    print("Add superstructure quality feature...")
+    train_data_cleaned = get_quality_of_superstructure(raw_data=train_values, df_to_add_info=train_data_cleaned)
+    test_data_cleaned = get_quality_of_superstructure(raw_data=test_values, df_to_add_info=test_data_cleaned)
 
 # Apply One Hot Encoding on categorical features
-print("One Hot Encoding features ...")
-train_data_cleaned, ohe = encode_train_data(x_train=train_data_cleaned)
-test_data_cleaned = encode_test_data(x_test=test_data_cleaned, ohe=ohe)
+if not cfg["feature_engineering"]["categorical_encoding"]["skip"]:
+    if cfg["feature_engineering"]["categorical_encoding"]["method"] == "One-Hot":
+        print("One Hot Encoding features ...")
+        train_data_cleaned, ohe = encode_train_data(x_train=train_data_cleaned)
+        test_data_cleaned = encode_test_data(x_test=test_data_cleaned, ohe=ohe)
 
 # Apply StandardScaler (method="standard") or MinMax Scaler (method="minmax") on Features
-print("Normalizing Data ...")
-train_data_cleaned, scaler = normalize_train_data(x_train=train_data_cleaned, method="minmax")
-test_data_cleaned = normalize_test_data(x_test=test_data_cleaned, scaler=scaler)
+if not cfg["feature_engineering"]["normalize"]["skip"]:
+    print("Normalizing Data ...")
+    train_data_cleaned, scaler = normalize_train_data(x_train=train_data_cleaned, method=cfg["feature_engineering"]["normalize"]["method"])
+    test_data_cleaned = normalize_test_data(x_test=test_data_cleaned, scaler=scaler)
 
 # Feature Selection: Get top k features using RFE, RFECV, or use MI
-print("Selecting best features using RFE CV ...")
-best_feats, rfecv = get_top_k_features_using_rfe_cv(x_train=train_data_cleaned,
-                                                    y_train=train_labels,
-                                                    min_features_to_select=5,
-                                                    k_folds=5,
-                                                    scoring="matthews_corrcoef",
-                                                    step=2,
-                                                    verbose=0)
+if not cfg["feature_engineering"]["feature_selection"]["skip"]:
+    if cfg["feature_engineering"]["feature_selection"]["method"] == "RFECV":
+        print("Selecting best features using RFE CV ...")
+        best_feats, rfecv = get_top_k_features_using_rfe_cv(x_train=train_data_cleaned,
+                                                            y_train=train_labels,
+                                                            min_features_to_select=5,
+                                                            k_folds=5,
+                                                            scoring="matthews_corrcoef",
+                                                            step=2,
+                                                            verbose=0)
 #plot_rfecv_scoring(rfecv)
 print(f"*** Number of best selected features: {rfecv.n_features_} of {rfecv.n_features_in_} in total ***")
+#print(f"\nSelected feature set: {best_feats}\n")
 
 # Keep best columns
 train_data_cleaned = train_data_cleaned[train_data_cleaned.columns.intersection(best_feats)]

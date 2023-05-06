@@ -1,15 +1,35 @@
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
+
+from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import cross_validate
+from sklearn.metrics import matthews_corrcoef, make_scorer
 
 
 def hyperparameter_optimization(model=None, hyperparameter_grid=None, train_data=None, train_labels=None):
     if model == "Dummy":
         model = DummyClassifier(strategy="most_frequent")
-
+    elif model == "RandomForest":
+        model = RandomForestClassifier(random_state=42)
+    
     # TODO: Delete this later in week 04 subtasks
-    print("Using RandomForest ...")
-    model = RandomForestClassifier(random_state=42)
+    print("Using DecisionTree ...")
+    
+    # Only for evaluating the engineered features, change in the week after
+    model = DecisionTreeClassifier()
+    skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
+    mcc_scorer = make_scorer(matthews_corrcoef)
+    cv_results = cross_validate(model, train_data, train_labels["damage_grade"].ravel(), cv=10,
+                                scoring=mcc_scorer,  # 'accuracy'
+                                n_jobs=-1,
+                                return_train_score=True)
+    model.fit(train_data, train_labels)
 
+    print("")
+    print(cv_results)
+    print("")
+    
     return model
 
 

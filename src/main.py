@@ -52,9 +52,9 @@ train_values.set_index("building_id", inplace=True)
 test_values.set_index("building_id", inplace=True)
 
 # Make Sample Size smaller for experimenting and testing; Keep commented!
-train_values = train_values.iloc[:7000]
-test_values = test_values.iloc[:7000]
-train_labels = train_labels.iloc[:7000]
+#train_values = train_values.iloc[:7000]
+#test_values = test_values.iloc[:7000]
+#train_labels = train_labels.iloc[:7000]
 
 # Data cleaning
 # Prepare raw data
@@ -126,8 +126,8 @@ test_data_cleaned = test_data_cleaned[test_data_cleaned.columns.intersection(bes
 
 # Model training: TBD
 print("Modelling ...")
-model = modelling.hyperparameter_optimization(model="Dummy")
-model.fit(train_data_cleaned, train_labels)
+model = modelling.hyperparameter_optimization(model="DecisionTree", train_data=train_data_cleaned, train_labels=train_labels)
+#model.fit(train_data_cleaned, train_labels)
 
 # Make prediction: TBD
 print("Make predictions ...")

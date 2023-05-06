@@ -80,9 +80,14 @@ train_data_cleaned = group_categorical_features(df=train_data_cleaned, default_v
 test_data_cleaned = group_categorical_features(df=test_data_cleaned, default_val="others", verbose=False)
 
 # Add new features for risk status
-print("Add risk status feature")
+print("Add risk status features")
 test_data_cleaned = get_risk_status_based_on_geo_level(data=train_values, df_to_add_info=test_data_cleaned, labels=train_labels, geo_level=1)
 train_data_cleaned = get_risk_status_based_on_geo_level(data=train_values, df_to_add_info=train_data_cleaned, labels=train_labels, geo_level=1)
+
+# Add superstructure quality
+print("Add superstructure quality feature")
+train_data_cleaned = get_quality_of_superstructure(raw_data=train_values, df_to_add_info=train_data_cleaned)
+test_data_cleaned = get_quality_of_superstructure(raw_data=test_values, df_to_add_info=test_data_cleaned)
 
 # Apply One Hot Encoding on categorical features
 print("One Hot Encoding features ...")

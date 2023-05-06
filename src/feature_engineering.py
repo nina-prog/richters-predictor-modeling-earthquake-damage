@@ -78,7 +78,7 @@ def normalize_train_data(x_train: pd.DataFrame, method: str = "standard"):
 
     x_train_scaled = scaler.fit_transform(x_train)
     # Transform back to pandas DataFrame
-    x_train_scaled = pd.DataFrame(x_train_scaled, columns=x_train.columns)
+    x_train_scaled = pd.DataFrame(x_train_scaled, columns=x_train.columns, index=x_train.index)
     return x_train_scaled, scaler
 
 
@@ -94,7 +94,7 @@ def normalize_test_data(x_test: pd.DataFrame, scaler) -> pd.DataFrame:
 
     x_test_scaled = scaler.transform(x_test)
     # Transform back to pandas DataFrame
-    x_test_scaled = pd.DataFrame(x_test_scaled, columns=x_test.columns)
+    x_test_scaled = pd.DataFrame(x_test_scaled, columns=x_test.columns, index=x_test.index)
     return x_test_scaled
 
 
@@ -194,8 +194,11 @@ def get_risk_status_based_on_geo_level(data=None, df_to_add_info=None, labels=No
     risk_df["damage_grade_3_risk_weighted"] = dg3w
     
     # Join features to data
+    df_to_add_info = df_to_add_info.reset_index()
+    risk_df = risk_df.reset_index()
     result = df_to_add_info.set_index(f"geo_level_{geo_level}_id").join(risk_df.set_index(f"geo_level_{geo_level}_id"))
     result = result.reset_index()
+    result = result.set_index("building_id")
     
     return result
 
@@ -259,7 +262,6 @@ def get_quality_of_superstructure(raw_data=None, df_to_add_info=None):
                 (raw_data["has_superstructure_stone_flag"] == 1)), "superstructure_quality"] = 0
     
     # Join new info to df
-    result = df_to_add_info.set_index("building_id").join(raw_data[["building_id", "superstructure_quality"]].set_index("building_id"))
-    result.reset_index(inplace=True)
+    result = df_to_add_info.join(raw_data[["superstructure_quality"]], how="left")
     
     return result

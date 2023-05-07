@@ -299,3 +299,30 @@ def dimensionality_reduction(train_data=None, test_data=None, method=None, n_nei
     test_data_transformed = pd.DataFrame(test_data_transformed, index=test_data.index)
     
     return train_data_transformed, test_data_transformed
+
+
+def stratify_dataframe_by_damage_grade(x_train=None, y_train=None, random_state=42):
+    """
+    Stratify the given dataframe by the damage grade. 
+    
+    :param x_train: The features to stratify
+    :param y_train: The according labels
+    :param random_state: The random state to use when sampling
+    
+    :returns (y_train, x_train) both stratified
+    """
+    df = x_train.join(y_train)
+    
+    # Get min number of samples per damage grade
+    groups = y_train.reset_index().groupby("damage_grade").count()
+    sample_count = min(groups["building_id"])
+    
+    # Get number 
+    df_damage_grade_1 = df[df["damage_grade"] == 1].sample(n=sample_count, random_state=random_state)
+    df_damage_grade_2 = df[df["damage_grade"] == 2].sample(n=sample_count, random_state=random_state)
+    df_damage_grade_3 = df[df["damage_grade"] == 3].sample(n=sample_count, random_state=random_state)
+    
+    result = pd.concat([df_damage_grade_1, df_damage_grade_2, df_damage_grade_3])
+    result = result.sample(frac=1, random_state=random_state)
+    
+    return result[["damage_grade"]], result.drop("damage_grade", axis=1)

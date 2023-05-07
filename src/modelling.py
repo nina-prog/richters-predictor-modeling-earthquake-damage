@@ -25,8 +25,8 @@ def hyperparameter_optimization(model=None, hyperparameter_grid=None, train_data
         scoring = "accuracy"
         
     model = DecisionTreeClassifier()
-    skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
-    cv_results = cross_validate(model, train_data, train_labels["damage_grade"].ravel(), cv=10,
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    cv_results = cross_validate(model, train_data, train_labels["damage_grade"].ravel(), cv=5,
                                 scoring=scoring,
                                 n_jobs=-1,
                                 return_train_score=True)

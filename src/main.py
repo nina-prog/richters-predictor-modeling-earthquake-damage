@@ -106,6 +106,7 @@ if not cfg["feature_engineering"]["normalize"]["skip"]:
     train_data_cleaned, scaler = normalize_train_data(x_train=train_data_cleaned, method=cfg["feature_engineering"]["normalize"]["method"])
     test_data_cleaned = normalize_test_data(x_test=test_data_cleaned, scaler=scaler)
 
+best_feats = []
 # Feature Selection: Get top k features using RFE, RFECV, or use MI
 if not cfg["feature_engineering"]["feature_selection"]["skip"]:
     if cfg["feature_engineering"]["feature_selection"]["method"] == "RFECV":
@@ -130,13 +131,13 @@ if not cfg["feature_engineering"]["feature_selection"]["skip"]:
                                                         y_train=train_labels,
                                                         k=cfg["feature_engineering"]["feature_selection"]["k"])
 
-#plot_rfecv_scoring(rfecv)
-#print(f"*** Number of best selected features: {rfecv.n_features_} of {rfecv.n_features_in_} in total ***")
-print(f"\nSelected feature set: {best_feats}\n")
+    #plot_rfecv_scoring(rfecv)
+    #print(f"*** Number of best selected features: {rfecv.n_features_} of {rfecv.n_features_in_} in total ***")
+    print(f"\nSelected feature set: {best_feats}\n")
 
-# Keep best columns
-train_data_cleaned = train_data_cleaned[train_data_cleaned.columns.intersection(best_feats)]
-test_data_cleaned = test_data_cleaned[test_data_cleaned.columns.intersection(best_feats)]
+    # Keep best columns
+    train_data_cleaned = train_data_cleaned[train_data_cleaned.columns.intersection(best_feats)]
+    test_data_cleaned = test_data_cleaned[test_data_cleaned.columns.intersection(best_feats)]
 
 if not cfg["feature_engineering"]["dimensionality_reduction"]["skip"]:
     if len(best_feats) > cfg["feature_engineering"]["dimensionality_reduction"]["feature_threshold"]:

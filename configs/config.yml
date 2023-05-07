@@ -58,7 +58,7 @@ feature_engineering:
     group_categorical: 
         skip: false
     risk_status: 
-        skip: false
+        skip: true
         geo_level: 1
     superstructure_quality: 
         skip: false

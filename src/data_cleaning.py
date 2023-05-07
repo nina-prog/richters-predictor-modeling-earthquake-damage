@@ -226,7 +226,8 @@ def handle_outliers_IQR(df, ignore_cols, iqr_factor=1.5, method="replace"):
     :rtype: pd.DataFrame
     """
     # Identify the numerical columns in the dataframe
-    tmp = df[[x for x in df.columns if (x not in ignore_cols and is_numeric_dtype(df[x]))]]
+    tmp = df[[col for col in df.columns.tolist() if (is_numeric_dtype(df[col]) and col not in ignore_cols)]]
+    non_tmp_df = df[df.columns.difference(tmp.columns)]
 
     # Calculate the IQR for each numerical column
     Q1 = tmp.quantile(0.25)
@@ -241,32 +242,37 @@ def handle_outliers_IQR(df, ignore_cols, iqr_factor=1.5, method="replace"):
     outlier_mask = (tmp < lower_bound) | (tmp > upper_bound)
     outlier_rows = outlier_mask.any(axis=1)
 
-    print(f"Found {outlier_mask.sum().sum()} outliers,using method'{method}'to handle them:" + "\n" + "#" * 10)
+    print(f"Found {outlier_mask.sum().sum()} outliers,using method'{method}'to handle them:")
     print(f"Count per column: {outlier_mask.sum().to_dict()}")
     print(f"Lower bound: {lower_bound.to_dict()}")
     print(f"Upper bound: {upper_bound.to_dict()}")
 
     if method == "hard_drop":
         # Drop rows with outliers
-        df = df[~outlier_rows]
+        df_no_outliers = df[~outlier_rows]
+
+        return df_no_outliers
 
     elif method == "soft_drop":
         # Compute the number of outliers per row and drop rows based on the threshold (30%)
         count_outliers = outlier_mask.notna().sum(axis=1)
         drop_indices = count_outliers[count_outliers >= 30 * len(tmp.columns)].index
-        df = df.drop(drop_indices)
+        df_filtered_outliers = df.drop(drop_indices)
+
+        return df_filtered_outliers
 
     elif method == "replace":
         upper_limit = tmp.mean() + 3 * tmp.std()
         lower_limit = tmp.mean() - 3 * tmp.std()
         # Replace outliers with upper or lower limit
         tmp = tmp.clip(lower=lower_limit, upper=upper_limit, axis=1)
-        df = pd.concat([df, tmp], axis=1)
+        # Concat with other data
+        df_replaced = pd.concat([non_tmp_df, tmp], axis=1)
+
+        return df_replaced
 
     else:
         raise ValueError(f"Invalid method:{method},must be either 'hard_drop' or 'replace' or 'soft_drop'.")
-
-    return df
 
 
 def prepare_data(df, config, ignore_cols, outlier_method):

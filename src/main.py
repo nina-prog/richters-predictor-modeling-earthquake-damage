@@ -53,9 +53,10 @@ train_values.set_index("building_id", inplace=True)
 test_values.set_index("building_id", inplace=True)
 
 # Make Sample Size smaller for experimenting and testing; Keep commented!
-train_values = train_values.iloc[:15000]
+train_labels, train_values = stratify_dataframe_by_damage_grade(train_values, train_labels, 42)
+#train_values = train_values.iloc[:15000]
 #test_values = test_values.iloc[:7000]
-train_labels = train_labels.iloc[:15000]
+#train_labels = train_labels.iloc[:15000]
 
 # Data cleaning
 # Prepare raw data

@@ -6,8 +6,10 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import cross_validate
 from sklearn.metrics import matthews_corrcoef, make_scorer
 
+import numpy as np
 
-def hyperparameter_optimization(model=None, hyperparameter_grid=None, train_data=None, train_labels=None):
+
+def hyperparameter_optimization(model=None, hyperparameter_grid=None, train_data=None, train_labels=None, scoring=None):
     if model == "Dummy":
         model = DummyClassifier(strategy="most_frequent")
     elif model == "RandomForest":
@@ -17,17 +19,22 @@ def hyperparameter_optimization(model=None, hyperparameter_grid=None, train_data
     print("Using DecisionTree ...")
     
     # Only for evaluating the engineered features, change in the week after
+    if scoring == "MCC":
+        scoring = make_scorer(matthews_corrcoef)
+    elif scoring == "ACC":
+        scoring = "accuracy"
+        
     model = DecisionTreeClassifier()
     skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
-    mcc_scorer = make_scorer(matthews_corrcoef)
     cv_results = cross_validate(model, train_data, train_labels["damage_grade"].ravel(), cv=10,
-                                scoring=mcc_scorer,  # 'accuracy'
+                                scoring=scoring,
                                 n_jobs=-1,
                                 return_train_score=True)
     model.fit(train_data, train_labels)
 
     print("")
-    print(cv_results)
+    print(f"CV Training: {round(np.mean(cv_results['train_score']), 4)} +/- {round(np.std(cv_results['train_score']), 4)}")
+    print(f"CV Test: {round(np.mean(cv_results['test_score']), 4)} +/- {round(np.std(cv_results['test_score']), 4)}")
     print("")
     
     return model

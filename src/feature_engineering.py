@@ -265,3 +265,37 @@ def get_quality_of_superstructure(raw_data=None, df_to_add_info=None):
     result = df_to_add_info.join(raw_data[["superstructure_quality"]], how="left")
     
     return result
+
+
+from sklearn.decomposition import PCA
+from sklearn.manifold import Isomap, LocallyLinearEmbedding, TSNE
+
+
+def dimensionality_reduction(train_data=None, test_data=None, method=None, n_neighbors=None, n_components=2, random_seed=42):
+    """
+    Applies a dimensionality reduction method on the given data. 
+    Implemented methods are LLE, Isomap, PCA and TSNE. 
+    
+    The features in the given dataframe have to be numerical and normalized.
+    
+    
+    """
+    assert method in ["LLE", "Isomap", "PCA", "TSNE"]
+    
+    if method == "LLE":
+        embedding = LocallyLinearEmbedding(n_components=n_components)
+    elif method == "Isomap":
+        embedding = Isomap(n_components=n_components)
+    elif method == "PCA":
+        embedding = PCA(n_components=n_components, random_state=random_seed)
+    elif method == "TSNE":
+        embedding = TSNE(n_components=n_components)
+    else: 
+        print(f"[ERROR] Dimensionality reduction method '{method}' is not implemented")
+        
+    train_data_transformed = embedding.fit_transform(train_data)
+    train_data_transformed = pd.DataFrame(train_data_transformed, index=train_data.index)
+    test_data_transformed = embedding.transform(test_data)
+    test_data_transformed = pd.DataFrame(test_data_transformed, index=test_data.index)
+    
+    return train_data_transformed, test_data_transformed

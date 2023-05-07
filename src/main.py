@@ -11,6 +11,7 @@ from feature_selection import get_top_k_features_using_mi
 from feature_engineering import encode_train_data, encode_test_data
 from feature_engineering import normalize_train_data, normalize_test_data
 from feature_engineering import get_quality_of_superstructure, get_risk_status_based_on_geo_level
+from feature_engineering import dimensionality_reduction
 import modelling
 
 
@@ -52,9 +53,9 @@ train_values.set_index("building_id", inplace=True)
 test_values.set_index("building_id", inplace=True)
 
 # Make Sample Size smaller for experimenting and testing; Keep commented!
-train_values = train_values.iloc[:100000]
+train_values = train_values.iloc[:15000]
 #test_values = test_values.iloc[:7000]
-train_labels = train_labels.iloc[:100000]
+train_labels = train_labels.iloc[:15000]
 
 # Data cleaning
 # Prepare raw data
@@ -137,9 +138,17 @@ print(f"\nSelected feature set: {best_feats}\n")
 train_data_cleaned = train_data_cleaned[train_data_cleaned.columns.intersection(best_feats)]
 test_data_cleaned = test_data_cleaned[test_data_cleaned.columns.intersection(best_feats)]
 
+if not cfg["feature_engineering"]["dimensionality_reduction"]["skip"]:
+    if len(best_feats) > cfg["feature_engineering"]["dimensionality_reduction"]["feature_threshold"]:
+        print(f"Perform dimensionality reduction...")
+        train_data_cleaned, test_data_cleaned = dimensionality_reduction(train_data=train_data_cleaned,
+                                                                         test_data=test_data_cleaned, 
+                                                                         method=cfg["feature_engineering"]["dimensionality_reduction"]["method"], 
+                                                                         n_components=cfg["feature_engineering"]["dimensionality_reduction"]["n_components"])
+
 # Model training: TBD
 print("Modelling ...")
-model = modelling.hyperparameter_optimization(model="DecisionTree", train_data=train_data_cleaned, train_labels=train_labels)
+model = modelling.hyperparameter_optimization(model="DecisionTree", train_data=train_data_cleaned, train_labels=train_labels, scoring=cfg["modelling"]["scoring"])
 #model.fit(train_data_cleaned, train_labels)
 
 # Make prediction: TBD

@@ -75,7 +75,7 @@ feature_engineering:
         step: 5
     dimensionality_reduction:
         skip: false
-        feature_threshold: 10
+        feature_threshold: 25
         method: "PCA"
         n_components: 0.7
         n_neighbors: None

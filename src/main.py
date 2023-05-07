@@ -114,8 +114,21 @@ if not cfg["feature_engineering"]["feature_selection"]["skip"]:
                                                             min_features_to_select=5,
                                                             k_folds=5,
                                                             scoring="matthews_corrcoef",
-                                                            step=2,
+                                                            step=cfg["feature_engineering"]["feature_selection"]["step"],
                                                             verbose=0)
+    if cfg["feature_engineering"]["feature_selection"]["method"] == "RFE":
+        print("Selecting best features using RFE...")
+        best_feats, rfecv = get_top_k_features_using_rfe(x_train=train_data_cleaned,
+                                                         y_train=train_labels,
+                                                         k=cfg["feature_engineering"]["feature_selection"]["k"], 
+                                                         step=cfg["feature_engineering"]["feature_selection"]["step"], 
+                                                         verbose=0)
+    if cfg["feature_engineering"]["feature_selection"]["method"] == "MI":
+        print("Selecting best features using RFE...")
+        best_feats, rfecv = get_top_k_features_using_mi(x_train=train_data_cleaned,
+                                                        y_train=train_labels,
+                                                        k=cfg["feature_engineering"]["feature_selection"]["k"])
+
 #plot_rfecv_scoring(rfecv)
 print(f"*** Number of best selected features: {rfecv.n_features_} of {rfecv.n_features_in_} in total ***")
 #print(f"\nSelected feature set: {best_feats}\n")

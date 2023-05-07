@@ -70,6 +70,8 @@ feature_engineering:
         method: "minmax"
     feature_selection: 
         skip: false
-        method: "RFECV"
+        method: "MI"
+        k: 30
+        step: 5
 modelling: 
     scoring: "MCC"

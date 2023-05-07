@@ -2,6 +2,7 @@ import argparse, sys
 import os
 import yaml
 import pandas as pd
+import numpy as np
 
 from data_cleaning import drop_correlated_features
 from data_cleaning import group_categorical_features
@@ -54,9 +55,9 @@ test_values.set_index("building_id", inplace=True)
 
 # Make Sample Size smaller for experimenting and testing; Keep commented!
 #train_labels, train_values = stratify_dataframe_by_damage_grade(train_values, train_labels, 42)
-train_values = train_values.iloc[:15000]
+#train_values = train_values.iloc[:15000]
 #test_values = test_values.iloc[:7000]
-train_labels = train_labels.iloc[:15000]
+#train_labels = train_labels.iloc[:15000]
 
 # Data cleaning
 # Prepare raw data
@@ -150,6 +151,8 @@ if not cfg["feature_engineering"]["dimensionality_reduction"]["skip"]:
 
 # Model training: TBD
 print("Modelling ...")
+train_data_cleaned = train_data_cleaned.astype(np.float64)
+train_labels = train_labels.astype(np.int8)
 model = modelling.hyperparameter_optimization(model="DecisionTree", train_data=train_data_cleaned, train_labels=train_labels, scoring=cfg["modelling"]["scoring"])
 #model.fit(train_data_cleaned, train_labels)
 

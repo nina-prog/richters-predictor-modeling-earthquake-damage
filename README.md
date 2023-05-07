@@ -25,7 +25,9 @@ This repository contains our project of the phase 1 of the **Practical Course: D
                                  'pip freeze > requirenments.txt'.
 ```
 
-## Setting up the environment and run the code
+## Setting up the environment and run the code on a local machine
+Note: Make sure Python 3.10 is installed
+
 1. Clone the repository with:
 
        git clone https://git.scc.kit.edu/data-science-lab-2023/group-5-targaryen/phase-1.git
@@ -39,3 +41,27 @@ This repository contains our project of the phase 1 of the **Practical Course: D
 
        cd phase-1
        python3 src/main.py --config "configs/config.yml"
+
+## Execute on a linux server using a script
+The build.sh script includes the correct command to run the Python code, and to specifies any required command line 
+arguments or configuration files.
+
+1. Clone the GitLab repository to your server using the git clone command. For example:
+
+```git clone https://git.scc.kit.edu/data-science-lab-2023/group-5-targaryen/phase-1.git```
+
+2. Change into the cloned repository directory:
+
+```cd phase-1```
+
+3. Make the build.sh script executable:
+
+```chmod +x build.sh```
+
+4. Run the build.sh script to install any required dependencies and run the Python code:
+
+```./build.sh```
+
+This should execute the script and run the Python code specified in src/main.py.
+
+That's it! With these steps, you should be able to execute the Python code from this Repo on your Linux server.

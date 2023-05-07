@@ -52,9 +52,9 @@ train_values.set_index("building_id", inplace=True)
 test_values.set_index("building_id", inplace=True)
 
 # Make Sample Size smaller for experimenting and testing; Keep commented!
-#train_values = train_values.iloc[:7000]
+train_values = train_values.iloc[:100000]
 #test_values = test_values.iloc[:7000]
-#train_labels = train_labels.iloc[:7000]
+train_labels = train_labels.iloc[:100000]
 
 # Data cleaning
 # Prepare raw data
@@ -124,14 +124,14 @@ if not cfg["feature_engineering"]["feature_selection"]["skip"]:
                                                          step=cfg["feature_engineering"]["feature_selection"]["step"], 
                                                          verbose=0)
     if cfg["feature_engineering"]["feature_selection"]["method"] == "MI":
-        print("Selecting best features using RFE...")
+        print("Selecting best features using MI...")
         best_feats, rfecv = get_top_k_features_using_mi(x_train=train_data_cleaned,
                                                         y_train=train_labels,
                                                         k=cfg["feature_engineering"]["feature_selection"]["k"])
 
 #plot_rfecv_scoring(rfecv)
-print(f"*** Number of best selected features: {rfecv.n_features_} of {rfecv.n_features_in_} in total ***")
-#print(f"\nSelected feature set: {best_feats}\n")
+#print(f"*** Number of best selected features: {rfecv.n_features_} of {rfecv.n_features_in_} in total ***")
+print(f"\nSelected feature set: {best_feats}\n")
 
 # Keep best columns
 train_data_cleaned = train_data_cleaned[train_data_cleaned.columns.intersection(best_feats)]

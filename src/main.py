@@ -120,7 +120,7 @@ if not cfg["feature_engineering"]["feature_selection"]["skip"]:
                                                             scoring="matthews_corrcoef",
                                                             step=cfg["feature_engineering"]["feature_selection"]["step"],
                                                             verbose=0)
-        plot_rfecv_scoring(rfecv)
+        #plot_rfecv_scoring(rfecv)
 
     if cfg["feature_engineering"]["feature_selection"]["method"] == "RFE":
         print("Selecting best features using RFE...")

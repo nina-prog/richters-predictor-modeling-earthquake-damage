@@ -3,6 +3,7 @@ import os
 import yaml
 import pandas as pd
 import numpy as np
+import time
 
 from data_cleaning import drop_correlated_features
 from data_cleaning import group_categorical_features
@@ -15,6 +16,8 @@ from feature_engineering import get_quality_of_superstructure, get_risk_status_b
 from feature_engineering import dimensionality_reduction
 import modelling
 
+# Track time for execution
+start_time = time.time()
 
 # Parse config
 print("Parse Config ...")
@@ -154,10 +157,20 @@ if not cfg["feature_engineering"]["dimensionality_reduction"]["skip"]:
 # Model training: TBD
 print("Modelling ...")
 train_data_cleaned = train_data_cleaned.astype(np.float64)
-train_labels = train_labels.astype(np.int8)
+
+# Save for week 04: Model prediction in data/processed
+train_data_cleaned.to_csv("data/processed/train_data_cleaned.csv")
+test_data_cleaned.to_csv("data/processed/test_data_cleaned.csv")
+train_labels.to_csv("data/processed/train_labels.csv")
+
 model = modelling.hyperparameter_optimization(model="RandomForest", train_data=train_data_cleaned, train_labels=train_labels, scoring=cfg["modelling"]["scoring"])
 #model.fit(train_data_cleaned, train_labels)
 
 # Make prediction: TBD
 print("Make predictions ...")
 modelling.make_prediction(model=model, test_data=test_data_cleaned, result_path=result_path)
+
+# Track time for execution and print
+end_time = time.time()
+run_time = end_time - start_time
+print(f"(Pipeline took {run_time:.2f} seconds)")

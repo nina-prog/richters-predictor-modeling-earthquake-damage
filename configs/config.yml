@@ -70,7 +70,7 @@ feature_engineering:
         method: "minmax"
     feature_selection: 
         skip: false
-        method: "MI"
+        method: "RFECV"
         k: 20
         step: 5
     dimensionality_reduction:

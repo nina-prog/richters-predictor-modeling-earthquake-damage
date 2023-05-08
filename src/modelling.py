@@ -18,23 +18,23 @@ def hyperparameter_optimization(model=None, hyperparameter_grid=None, train_data
     elif model == "DecisionTree":
         print("Fitting DecisionTree ...")
         model = DecisionTreeClassifier(random_state=42)
-    
+
+    scoring_string = scoring
     # Only for evaluating the engineered features, change in the week after
     if scoring == "MCC":
         scoring = make_scorer(matthews_corrcoef)
     elif scoring == "ACC":
         scoring = "accuracy"
 
-    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-    cv_results = cross_validate(model, train_data, train_labels["damage_grade"].ravel(), cv=3,
+    cv_results = cross_validate(model, train_data, train_labels["damage_grade"].ravel(), cv=5,
                                 scoring=scoring,
                                 n_jobs=-1,
                                 return_train_score=True)
     model.fit(train_data, train_labels["damage_grade"].ravel())
 
     print("")
-    print(f"CV Training: {round(np.mean(cv_results['train_score']), 4)} +/- {round(np.std(cv_results['train_score']), 4)}")
-    print(f"CV Test: {round(np.mean(cv_results['test_score']), 4)} +/- {round(np.std(cv_results['test_score']), 4)}")
+    print(f"CV Training: {round(np.mean(cv_results['train_score']), 4)} +/- {round(np.std(cv_results['train_score']), 4)} {scoring_string}")
+    print(f"CV Test: {round(np.mean(cv_results['test_score']), 4)} +/- {round(np.std(cv_results['test_score']), 4)} {scoring_string}")
     print("")
     
     return model

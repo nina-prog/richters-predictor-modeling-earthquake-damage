@@ -7,7 +7,7 @@ import numpy as np
 from data_cleaning import drop_correlated_features
 from data_cleaning import group_categorical_features
 from data_cleaning import  prepare_data
-from feature_selection import get_top_k_features_using_rfe_cv, plot_rfecv_scoring
+from feature_selection import get_top_k_features_using_rfe_cv, get_top_k_features_using_rfe, plot_rfecv_scoring
 from feature_selection import get_top_k_features_using_mi
 from feature_engineering import encode_train_data, encode_test_data
 from feature_engineering import normalize_train_data, normalize_test_data
@@ -153,7 +153,7 @@ if not cfg["feature_engineering"]["dimensionality_reduction"]["skip"]:
 print("Modelling ...")
 train_data_cleaned = train_data_cleaned.astype(np.float64)
 train_labels = train_labels.astype(np.int8)
-model = modelling.hyperparameter_optimization(model="DecisionTree", train_data=train_data_cleaned, train_labels=train_labels, scoring=cfg["modelling"]["scoring"])
+model = modelling.hyperparameter_optimization(model="RandomForest", train_data=train_data_cleaned, train_labels=train_labels, scoring=cfg["modelling"]["scoring"])
 #model.fit(train_data_cleaned, train_labels)
 
 # Make prediction: TBD

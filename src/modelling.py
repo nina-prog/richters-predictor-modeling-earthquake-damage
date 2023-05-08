@@ -13,24 +13,24 @@ def hyperparameter_optimization(model=None, hyperparameter_grid=None, train_data
     if model == "Dummy":
         model = DummyClassifier(strategy="most_frequent")
     elif model == "RandomForest":
+        print("Fitting RandomForest ...")
         model = RandomForestClassifier(random_state=42)
-    
-    # TODO: Delete this later in week 04 subtasks
-    print("Using DecisionTree ...")
+    elif model == "DecisionTree":
+        print("Fitting DecisionTree ...")
+        model = DecisionTreeClassifier(random_state=42)
     
     # Only for evaluating the engineered features, change in the week after
     if scoring == "MCC":
         scoring = make_scorer(matthews_corrcoef)
     elif scoring == "ACC":
         scoring = "accuracy"
-        
-    model = DecisionTreeClassifier()
+
     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-    cv_results = cross_validate(model, train_data, train_labels["damage_grade"].ravel(), cv=5,
+    cv_results = cross_validate(model, train_data, train_labels["damage_grade"].ravel(), cv=3,
                                 scoring=scoring,
                                 n_jobs=-1,
                                 return_train_score=True)
-    model.fit(train_data, train_labels)
+    model.fit(train_data, train_labels["damage_grade"].ravel())
 
     print("")
     print(f"CV Training: {round(np.mean(cv_results['train_score']), 4)} +/- {round(np.std(cv_results['train_score']), 4)}")
@@ -50,5 +50,6 @@ def make_prediction(model=None, test_data=None, result_path=None):
     :returns A set of correlated feature names
     """
     predictions = model.predict(test_data)
-    test_data["damage_grade"] = predictions[:,1]
+    test_data["damage_grade"] = predictions
     test_data.to_csv(result_path, columns=["damage_grade"], index_label="building_id")
+    print(f"Saved final prediction in '{result_path}'")

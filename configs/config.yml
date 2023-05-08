@@ -2,7 +2,7 @@ paths:
     train_values: "data/raw/train_values.csv"
     train_labels: "data/raw/train_labels.csv"
     test_values: "data/raw/test_values.csv"
-    result: "data/processed/targaryen_prediction.csv"
+    result: "data/predictions/targaryen_prediction.csv"
 data_cleaning:
     columns_to_remove: ['has_secondary_use_rental',
                         'has_secondary_use_institution',
@@ -71,7 +71,7 @@ feature_engineering:
     feature_selection: 
         skip: false
         method: "MI"
-        k: 30
+        k: 20
         step: 5
     dimensionality_reduction:
         skip: true

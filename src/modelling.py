@@ -31,7 +31,14 @@ def hyperparameter_optimization(model=None, hyperparameter_grid=None, train_data
         model = DecisionTreeClassifier(random_state=42)
     elif model == "XGBoost":
         print("Fitting XGBoost ...")
-        model = xgboost.XGBClassifier(random_state=42, n_jobs=-1)
+        #model = xgboost.XGBClassifier(random_state=42, n_jobs=-1)
+        model = xgboost.XGBClassifier(n_estimators=100,
+                                      max_depth=20,
+                                      learning_rate=0.1,
+                                      subsample=0.8,
+                                      colsample_bytree=0.8,
+                                      random_state=42,
+                                      n_jobs=-1)
 
     scoring_string = scoring
     # Only for evaluating the engineered features, change in the week after

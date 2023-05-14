@@ -158,13 +158,11 @@ if not cfg["feature_engineering"]["dimensionality_reduction"]["skip"]:
 print("Modelling ...")
 train_data_cleaned = train_data_cleaned.astype(np.float64)
 
-# Save for week 04: Model prediction in data/processed
-train_data_cleaned.to_csv("data/processed/train_data_cleaned.csv")
-test_data_cleaned.to_csv("data/processed/test_data_cleaned.csv")
-train_labels.to_csv("data/processed/train_labels.csv")
-
-model = modelling.hyperparameter_optimization(model="RandomForest", train_data=train_data_cleaned, train_labels=train_labels, scoring=cfg["modelling"]["scoring"])
-#model.fit(train_data_cleaned, train_labels)
+# Return fitted model
+model = modelling.hyperparameter_optimization(model="XGBoost",
+                                              train_data=train_data_cleaned,
+                                              train_labels=train_labels,
+                                              scoring=cfg["modelling"]["scoring"])
 
 # Make prediction: TBD
 print("Make predictions ...")
@@ -173,4 +171,4 @@ modelling.make_prediction(model=model, test_data=test_data_cleaned, result_path=
 # Track time for execution and print
 end_time = time.time()
 run_time = end_time - start_time
-print(f"(Pipeline took {run_time:.2f} seconds)")
+print(f"-- Pipeline took {run_time:.2f} seconds --")

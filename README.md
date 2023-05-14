@@ -35,11 +35,15 @@ This repository contains our project of the phase 1 of the **Practical Course: D
 
 1. Clone the repository by running the following command in your terminal:
 
-   ```git clone https://git.scc.kit.edu/data-science-lab-2023/group-5-targaryen/phase-1.git```
+   ```
+   git clone https://git.scc.kit.edu/data-science-lab-2023/group-5-targaryen/phase-1.git
+   ```
 
 2. Navigate to the project root directory by running the following command in your terminal:
 
-   ```cd phase-1```
+   ```
+   cd phase-1
+   ```
 
 3. [Optional] Create a virtual environment and activate it. For example, using the built-in `venv` module in Python:
    ```
@@ -49,7 +53,9 @@ This repository contains our project of the phase 1 of the **Practical Course: D
 
 4. Install the required packages by running the following command in your terminal:
 
-   ```pip install -r requirements.txt```
+   ```
+   pip install -r requirements.txt
+   ```
 
 5. Place the data in the phase-1/data/raw folder. Ensure that the data is in the appropriate format and structure 
 required by the pipeline. The dataset can be downloaded as is from the 
@@ -57,7 +63,9 @@ required by the pipeline. The dataset can be downloaded as is from the
 
 6. Run the pipeline with the following command:
 
-   ```python3 src/main.py --config "configs/config.yml"```
+   ```
+   python3 src/main.py --config "configs/config.yml"
+   ```
 
 By following these steps, you should be able to successfully run the  pipeline on the data and obtain the desired 
 results. You can also monitor the pipeline's progress through the logs printed in the terminal. If any errors or issues 

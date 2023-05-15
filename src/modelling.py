@@ -40,12 +40,6 @@ def hyperparameter_optimization(model=None, hyperparameter_grid=None, train_data
                                       random_state=42,
                                       n_jobs=-1)
 
-    scoring_string = scoring
-    # Only for evaluating the engineered features, change in the week after
-    if scoring == "MCC":
-        scoring = make_scorer(matthews_corrcoef)
-    elif scoring == "ACC":
-        scoring = "accuracy"
 
     cv_results = cross_validate(model, train_data, train_labels, cv=5,
                                 scoring=scoring,
@@ -53,12 +47,16 @@ def hyperparameter_optimization(model=None, hyperparameter_grid=None, train_data
                                 return_train_score=True)
     model.fit(train_data, train_labels)
 
+
     print("")
-    print(f"CV Training: {round(np.mean(cv_results['train_score']), 4)} +/- {round(np.std(cv_results['train_score']), 4)} {scoring_string}")
-    print(f"CV Test: {round(np.mean(cv_results['test_score']), 4)} +/- {round(np.std(cv_results['test_score']), 4)} {scoring_string}")
+    print(f"CV Training ACC: {round(np.mean(cv_results['train_accuracy']), 4)} +/- {round(np.std(cv_results['train_accuracy']), 4)} ")
+    print(f"CV Test ACC: {round(np.mean(cv_results['test_accuracy']), 4)} +/- {round(np.std(cv_results['test_accuracy']), 4)}")
+    print("")
+    print(f"CV Training MCC: {round(np.mean(cv_results['train_matthews_corrcoef']), 4)} +/- {round(np.std(cv_results['train_matthews_corrcoef']), 4)} ")
+    print(f"CV Test MCC: {round(np.mean(cv_results['test_matthews_corrcoef']), 4)} +/- {round(np.std(cv_results['test_matthews_corrcoef']), 4)}")
     print("")
     
-    return model
+    return model, cv_results
 
 
 def make_prediction(model=None, test_data=None, result_path=None):

@@ -159,7 +159,7 @@ print("Modelling ...")
 train_data_cleaned = train_data_cleaned.astype(np.float64)
 
 # Return fitted model
-model = modelling.hyperparameter_optimization(model="XGBoost",
+model, cv_results = modelling.hyperparameter_optimization(model="XGBoost",
                                               train_data=train_data_cleaned,
                                               train_labels=train_labels,
                                               scoring=cfg["modelling"]["scoring"])

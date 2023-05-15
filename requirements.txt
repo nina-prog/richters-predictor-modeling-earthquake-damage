@@ -100,3 +100,4 @@ websocket-client==1.5.1
 widgetsnbextension==4.0.7
 statsmodels==0.13.2
 xgboost==1.7.5
+imblearn==0.10.1

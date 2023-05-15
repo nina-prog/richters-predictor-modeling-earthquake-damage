@@ -39,6 +39,7 @@ This repository contains our project of the phase 1 of the **Practical Course: D
    git clone https://git.scc.kit.edu/data-science-lab-2023/group-5-targaryen/phase-1.git
    ```
 
+
 2. Navigate to the project root directory by running the following command in your terminal:
 
    ```

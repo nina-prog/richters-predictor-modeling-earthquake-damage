@@ -58,7 +58,7 @@ def hyperparameter_optimization(model=None, hyperparameter_grid=None, train_data
     print(f"CV Test: {round(np.mean(cv_results['test_score']), 4)} +/- {round(np.std(cv_results['test_score']), 4)} {scoring_string}")
     print("")
     
-    return model
+    return model, cv_results
 
 
 def make_prediction(model=None, test_data=None, result_path=None):

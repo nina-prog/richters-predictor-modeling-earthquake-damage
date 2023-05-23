@@ -3,6 +3,8 @@ import numpy as np
 
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.decomposition import PCA
+from sklearn.manifold import Isomap, LocallyLinearEmbedding, TSNE
 
 
 def encode_train_data(x_train: pd.DataFrame):
@@ -11,6 +13,7 @@ def encode_train_data(x_train: pd.DataFrame):
     We need the fitted OHE object to transform our test data thus we also return the OHE object.
 
     :param x_train:
+
     :return: Encoded DataFrame and fitted OHE object
     """
     x_train_cats = x_train.select_dtypes(['object', 'category'])
@@ -66,6 +69,7 @@ def normalize_train_data(x_train: pd.DataFrame, method: str = "standard"):
 
     :param x_train: train DataFrame
     :param method: Method to scale, either 'standard' or 'minmax'
+
     :return: Scaled Train DataFrame
     """
     assert method in ["standard", "minmax"], print("method must either be 'standard' or 'minmax'")
@@ -89,6 +93,7 @@ def normalize_test_data(x_test: pd.DataFrame, scaler) -> pd.DataFrame:
 
     :param x_test: test DataFrame
     :param scaler: Fitted StandardScaler or MinMax Scaler object, yielded from 'normalize_train_data' function
+
     :return: Scaled Test DataFrame
     """
 
@@ -112,7 +117,7 @@ def get_risk_status_based_on_geo_level(data=None, df_to_add_info=None, labels=No
     :param labels: The series with the damage grade of each building
     :param geo_level: Specifies the geo level on which to calculate the statistics. Must be a number of {1, 2, 3}
     
-    :returns a pandas Dataframe with the additional information
+    :return: A pandas Dataframe with the additional information.
     """
     df = data.join(labels)
     
@@ -219,56 +224,36 @@ def get_quality_of_superstructure(raw_data=None, df_to_add_info=None):
     """
     # encode superstructure as good = 1, no idea = 0; bad = -1
     # Also set combinations of good+bad, good+other, bad+other to 0
-    
+
     # Default to -1 --> all bad are right
     raw_data["superstructure_quality"] = -1
 
-    # Update all good superstructures
-    raw_data.loc[(raw_data["has_superstructure_bamboo"] == 1) | 
-                (raw_data["has_superstructure_rc_engineered"] == 1) | 
-                (raw_data["has_superstructure_rc_non_engineered"] == 1) | 
-                (raw_data["has_superstructure_timber"] == 1), "superstructure_quality"] = 1
+    # Init superstructure quality for - all good superstructures (steel, bamboo, timber, reinforced concrete) to 1
+    good_superstructures = ["has_superstructure_bamboo", "has_superstructure_rc_engineered",
+                            "has_superstructure_rc_non_engineered", "has_superstructure_timber"]
+    has_good_superstructures = raw_data[good_superstructures].any(axis=1)
+    raw_data.loc[has_good_superstructures, "superstructure_quality"] = 1
 
-    # Update all other superstructures
-    raw_data.loc[(raw_data["has_superstructure_other"] == 1), "superstructure_quality"] = 0
+    # Init superstructure quality for - all other superstructures (other than good or bad) to 0
+    raw_data.loc[raw_data["has_superstructure_other"] == 1, "superstructure_quality"] = 0
 
-    # Update combinations of superstructures
-    # Combination of good + other
-    raw_data.loc[((raw_data["has_superstructure_bamboo"] == 1) | 
-                (raw_data["has_superstructure_rc_engineered"] == 1) | 
-                (raw_data["has_superstructure_rc_non_engineered"] == 1) | 
-                (raw_data["has_superstructure_timber"] == 1)) & 
-                (raw_data["has_superstructure_other"] == 1), "superstructure_quality"] = 0
+    # Update different combinations of superstructure of good+other or good+bad or bad+other to 0
+    bad_superstructures = ["has_superstructure_adobe_mud", "has_superstructure_mud_mortar_stone",
+                           "has_superstructure_cement_mortar_stone", "has_superstructure_mud_mortar_brick",
+                           "has_superstructure_cement_mortar_brick", "has_superstructure_stone_flag"]
+    has_bad_superstructures = raw_data[bad_superstructures].any(axis=1)
 
-    # Combination of good + bad
-    raw_data.loc[((raw_data["has_superstructure_bamboo"] == 1) | 
-                (raw_data["has_superstructure_rc_engineered"] == 1) | 
-                (raw_data["has_superstructure_rc_non_engineered"] == 1) | 
-                (raw_data["has_superstructure_timber"] == 1)) & 
-                ((raw_data["has_superstructure_adobe_mud"] == 1) |
-                (raw_data["has_superstructure_mud_mortar_stone"] == 1) |
-                (raw_data["has_superstructure_cement_mortar_stone"] == 1) |
-                (raw_data["has_superstructure_mud_mortar_brick"] == 1) |
-                (raw_data["has_superstructure_cement_mortar_brick"] == 1) |
-                (raw_data["has_superstructure_stone_flag"] == 1)), "superstructure_quality"] = 0
+    raw_data.loc[
+        (has_good_superstructures & raw_data["has_superstructure_other"] == 1) |
+        (has_good_superstructures & has_bad_superstructures) |
+        (raw_data["has_superstructure_other"] == 1 & has_bad_superstructures),
+        "superstructure_quality"
+    ] = 0
 
-    # Combination of bad + other
-    raw_data.loc[(raw_data["has_superstructure_other"] == 1) & 
-                ((raw_data["has_superstructure_adobe_mud"] == 1) |
-                (raw_data["has_superstructure_mud_mortar_stone"] == 1) |
-                (raw_data["has_superstructure_cement_mortar_stone"] == 1) |
-                (raw_data["has_superstructure_mud_mortar_brick"] == 1) |
-                (raw_data["has_superstructure_cement_mortar_brick"] == 1) |
-                (raw_data["has_superstructure_stone_flag"] == 1)), "superstructure_quality"] = 0
-    
     # Join new info to df
     result = df_to_add_info.join(raw_data[["superstructure_quality"]], how="left")
     
     return result
-
-
-from sklearn.decomposition import PCA
-from sklearn.manifold import Isomap, LocallyLinearEmbedding, TSNE
 
 
 def dimensionality_reduction(train_data=None, test_data=None, method=None, n_neighbors=None, n_components=2, random_seed=42):
@@ -280,17 +265,14 @@ def dimensionality_reduction(train_data=None, test_data=None, method=None, n_nei
     
     
     """
-    assert method in ["LLE", "Isomap", "PCA", "TSNE"]
-    
-    if method == "LLE":
-        embedding = LocallyLinearEmbedding(n_components=n_components)
-    elif method == "Isomap":
-        embedding = Isomap(n_components=n_components)
-    elif method == "PCA":
-        embedding = PCA(n_components=n_components, random_state=random_seed)
-    elif method == "TSNE":
-        embedding = TSNE(n_components=n_components)
-    else: 
+    dim_reduction_methods = {"LLE": LocallyLinearEmbedding(n_components=n_components),
+                             "Isomap": Isomap(n_components=n_components),
+                             "PCA": PCA(n_components=n_components, random_state=random_seed),
+                             "TSNE": TSNE(n_components=n_components)}
+
+    try:
+        embedding = dim_reduction_methods[method]
+    except KeyError:
         print(f"[ERROR] Dimensionality reduction method '{method}' is not implemented")
         
     train_data_transformed = embedding.fit_transform(train_data)
@@ -309,7 +291,7 @@ def stratify_dataframe_by_damage_grade(x_train=None, y_train=None, random_state=
     :param y_train: The according labels
     :param random_state: The random state to use when sampling
     
-    :returns (y_train, x_train) both stratified
+    :return: (y_train, x_train) both stratified
     """
     df = x_train.join(y_train)
     

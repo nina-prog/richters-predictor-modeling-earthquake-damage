@@ -51,6 +51,7 @@ def get_top_k_features_using_rfe_cv(x_train: pd.DataFrame,
     :param scoring: Scoring metric, e.g. 'accuracy' (default is MCC)
     :param step: Step size of the RFE
     :param verbose: Verbosity level
+
     :return: List of k top features and fitted RFECV Object
     """
 
@@ -77,6 +78,7 @@ def plot_rfe_ranking(rfe: RFE):
     Plots results from RFE, i.e. feature and its rank in barplot.
 
     :param rfe: Fitted RFE object; Gets returned from 'get_top_k_features_using_rfe' function
+
     :return: None
     """
 
@@ -120,6 +122,7 @@ def plot_mi_ranking(mi_scores):
     Plots results of the Mutual Information Score.
 
     :param mi_scores: Pandas Series -- Output of the get_top_k_features_using_mi function
+
     :return: None
     """
 
@@ -136,6 +139,7 @@ def get_step_sizes(rfecv):
     Helper function to get the number of features in each step from the RFECV.
 
     :param rfecv: Fitted RFECV object
+
     :return: List of number of features analysed
     """
     minfeat = rfecv.min_features_to_select
@@ -160,6 +164,7 @@ def plot_rfecv_scoring(rfecv):
     Plots the Mean Test Scoring Value (MCC) of the steps of the RFECV.
 
     :param rfecv: Fitted RFECV object
+
     :return: None
     """
     plt.figure(figsize=(12,5))

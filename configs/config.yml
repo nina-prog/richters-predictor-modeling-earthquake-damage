@@ -81,3 +81,4 @@ feature_engineering:
         n_neighbors: None
 modelling: 
     scoring: ["accuracy", "matthews_corrcoef"]
+    verbosity: 2

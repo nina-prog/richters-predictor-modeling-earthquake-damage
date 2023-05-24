@@ -55,11 +55,10 @@ train_values = pd.read_csv(train_values_path).set_index("building_id")
 train_labels = pd.read_csv(train_labels_path).set_index("building_id")
 test_values = pd.read_csv(test_values_path).set_index("building_id")
 
-""" Make Sample Size smaller for experimenting and testing; Keep commented!
-#train_labels, train_values = stratify_dataframe_by_damage_grade(train_values, train_labels, 42)
-#train_values = train_values.iloc[:15000]
-#test_values = test_values.iloc[:7000]
-#train_labels = train_labels.iloc[:15000] """
+""" Make Sample Size smaller for experimenting and testing; Keep commented! 
+#train_values = train_values.iloc[:5000]
+#train_labels = train_labels.iloc[:5000]
+"""
 
 """ ########## Data Cleaning ########## """
 # Prepare raw data
@@ -184,8 +183,12 @@ if verbosity >= 1:
 train_data_cleaned = train_data_cleaned.astype(np.float64)
 
 # Return fitted model
-model, cv_results = modelling.train_model(model="XGBoost", train_data=train_data_cleaned, train_labels=train_labels,
-                                          scoring=cfg["modelling"]["scoring"], verbose=verbose)
+model, cv_results = modelling.train_model(model="XGBoost",
+                                          hyperparameter_grid=cfg["modelling"]["params_xgb"],
+                                          train_data=train_data_cleaned,
+                                          train_labels=train_labels,
+                                          scoring=cfg["modelling"]["scoring"],
+                                          verbose=verbose)
 
 # Make prediction
 if verbosity >= 1:

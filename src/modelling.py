@@ -54,9 +54,6 @@ def train_model(model=None, hyperparameter_grid=None, train_data=None, train_lab
         }
     else:
         model_collection = {
-            "Dummy": DummyClassifier(**hyperparameter_grid),
-            "RandomForest": RandomForestClassifier(**hyperparameter_grid),
-            "DecisionTree": DecisionTreeClassifier(**hyperparameter_grid),
             "XGBoost": xgboost.XGBClassifier(**hyperparameter_grid)
         }
 
@@ -81,7 +78,7 @@ def train_model(model=None, hyperparameter_grid=None, train_data=None, train_lab
 
     # Fit model
     if verbose:
-        print(f"Fitting {model} ...")
+        print(f"Fitting Model ...")
     model.fit(train_data, train_labels)
 
     # Print results

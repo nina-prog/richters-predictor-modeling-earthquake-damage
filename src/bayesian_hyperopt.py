@@ -1,17 +1,24 @@
+"""
+This python file is used to perform bayesian hyperparameter optimization on the processed data.
+It is not intended to call this file on the pipeline. Instead, execute this file using the follow commands
+while in the root directory, i.e. phase-1:
+- python3 src/bayesian_hyeropt.py
+This will perform the Bayesian Hyperparameter search on 100% of the train data with all default params.
+You can also use:
+- python3 src/bayesian_hyeropt.py --use_test_split --subsample 100000 --n_iter 100
+To specify whether to split into train test, use subsample or the number of iterations of the BayesianSearch
+"""
+
 import pandas as pd
 import argparse
 import time
 import os
-import xgboost
-import numpy as np
-import matplotlib.pyplot as plt
 import xgboost
 import datetime
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import matthews_corrcoef, accuracy_score
-from sklearn.neighbors import NearestNeighbors
 
 from skopt import BayesSearchCV
 from skopt.space import Real, Categorical, Integer
@@ -85,6 +92,11 @@ def get_prediction_score(model, X_test, y_test, rename=True):
 
 
 def encode_labels(y_train):
+    """
+    Encodes the labels using LabelEncoder. Only relevant if XGBClassifier is used.
+    :param y_train: Labels of the train data {1, 2, 3}
+    :return: Encoded Labels of the train data {0, 1, 2}
+    """
     print("Encoding labels ...")
 
     # XGBoost expects [0, 1, 2] class labels instead of [1, 2, 3]
@@ -96,7 +108,8 @@ def encode_labels(y_train):
 
 def perform_bayessearch(X_train, y_train, n_iter=100):
     """
-    Performs BayesSearchCV with given parameter grid for XGBClassfier
+    Performs BayesSearchCV with given parameter grid for XGBClassifier.
+
     :param X_train: Train Data
     :param y_train: Labels of Train Data
     :param n_iter: Number of iterations of BayesSearch
@@ -140,6 +153,7 @@ def perform_bayessearch(X_train, y_train, n_iter=100):
     mean = bayes_opt_cv_results['mean_test_score'].values[0]
     std = bayes_opt_cv_results['std_test_score'].values[0]
     print(f"Mean Test Score: {mean:.4f} +/- {std:.4f}")
+    print(80 * "=")
 
     return bayes_opt, bayes_opt_cv_results
 
@@ -163,6 +177,20 @@ def save_cv_results(cv_results: pd.DataFrame, path: str):
 
 
 def main(split_data: bool = False, subsample = None, n_iter=100):
+    """
+    Main function to execute all necessary steps for the BayesSearch i.e.
+    - Data Loading (supports subsampling)
+    - Optional: Split into Train-Test Sets
+    - Encoding
+    - BayesSearchCV
+    - Saving of the Results
+    - Optional: Scoring on the Test Set
+
+    :param split_data: bool, whether to create hold-out-set (0.2 frac)
+    :param subsample: int, number of subsamples to take
+    :param n_iter: int, number of iterations of the BayesSearchCV
+    :return: None
+    """
     # Load Data from processed folder
     X_train, y_train = load_data_from_processed(path_xtrain="data/processed/train_data_cleaned.csv",
                                                 path_ytrain="data/processed/train_labels.csv",
@@ -201,8 +229,8 @@ if __name__ == "__main__":
                         default=False,
                         action="store_true",
                         help="Bool -- Whether to use test split or not")
-    parser.add_argument("--subsample", type=int)
-    parser.add_argument("--n_iter", type=int)
+    parser.add_argument("--subsample", type=int, help="Number of samples to use")
+    parser.add_argument("--n_iter", type=int, help="Number of iterations of BayesSearchCV")
     args = parser.parse_args()
 
     # Parse whether to use split_data

@@ -229,8 +229,8 @@ if __name__ == "__main__":
                         default=False,
                         action="store_true",
                         help="Bool -- Whether to use test split or not")
-    parser.add_argument("--subsample", type=int, help="Number of samples to use")
-    parser.add_argument("--n_iter", type=int, help="Number of iterations of BayesSearchCV")
+    parser.add_argument("--subsample", default=None, type=int, help="Number of samples to use")
+    parser.add_argument("--n_iter", default=100, type=int, help="Number of iterations of BayesSearchCV")
     args = parser.parse_args()
 
     # Parse whether to use split_data
@@ -238,6 +238,6 @@ if __name__ == "__main__":
     subsample = args.subsample
     n_iter = args.n_iter
 
-    # Call main
+    # Call main with parsed args
     main(split_data=split_data, subsample=subsample, n_iter=n_iter)
 

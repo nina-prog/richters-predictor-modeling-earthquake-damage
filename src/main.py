@@ -11,7 +11,7 @@ from data_cleaning import group_categorical_features
 from data_cleaning import prepare_data
 from feature_engineering import dimensionality_reduction
 from feature_engineering import (encode_train_data, encode_test_data, normalize_train_data, normalize_test_data,
-                                 get_quality_of_superstructure, get_risk_status_based_on_geo_level)
+                                 get_quality_of_superstructure, get_risk_status_based_on_geo_level, get_geocoded_districts)
 from feature_selection import (get_top_k_features_using_rfe_cv, get_top_k_features_using_rfe,
                                get_top_k_features_using_mi)
 from utils import load_config, check_file_exists
@@ -98,6 +98,17 @@ if not cfg["feature_engineering"]["risk_status"].get("skip", False):
     train_data_cleaned = get_risk_status_based_on_geo_level(data=train_values, df_to_add_info=train_data_cleaned,
                                                             labels=train_labels,
                                                             geo_level=cfg["feature_engineering"]["risk_status"]["geo_level"])
+
+# Add geocoded districts features
+if not cfg["feature_engineering"]["geocoded_districts"].get("skip", False):
+    if verbosity >= 1:
+        print("Add geocoded districts features (lat, long, name of the district) ...")
+    train_data_cleaned = get_geocoded_districts(df=train_values,
+                                                geo_path=cfg["feature_engineering"]["geocoded_districts"]["geo_path"],
+                                                drop_key=cfg["feature_engineering"]["geocoded_districts"]["drop_key"])
+    test_data_cleaned = get_geocoded_districts(df=test_values,
+                                                  geo_path=cfg["feature_engineering"]["geocoded_districts"]["geo_path"],
+                                                  drop_key=cfg["feature_engineering"]["geocoded_districts"]["drop_key"])
 
 # Add superstructure quality
 if not cfg["feature_engineering"]["superstructure_quality"].get("skip", False):

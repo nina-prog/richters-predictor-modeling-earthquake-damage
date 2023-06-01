@@ -103,6 +103,39 @@ def normalize_test_data(x_test: pd.DataFrame, scaler) -> pd.DataFrame:
     return x_test_scaled
 
 
+def get_geocoded_districts(df, geo_path, drop_key=False):
+    """
+    Get and add geocoded information to X_train. The geocoded information is the district name, latitude and longitude.
+    The district name is mapped to the geo_level_1_id of X_train. The latitude and longitude are mapped to the district
+     name. The geocoded information is added as new features to X_train.
+
+    :param df: X_train without geocoded information.
+    :type df: pandas.DataFrame
+    :param geo_df: Pandas Dataframe containing the geocoded information. Must contain the columns 'geo_level_1_id',
+    'district', 'latitude' and 'longitude'.
+    :type geo_df: pandas.DataFrame
+    :param drop_key: Drop key, geo_level_1_id, after merging, defaults to False.
+    :type drop_key: bool, optional
+
+    :return: X_train with geocoded information
+    :rtype: pandas.DataFrame
+    """
+    # Load geocoded districts
+    geo_df = pd.read_csv(geo_path)
+    # Make sure key column is of the same type
+    df["geo_level_1_id"] = df["geo_level_1_id"].astype(str)
+    geo_df["geo_level_1_id"] = geo_df["geo_level_1_id"].astype(str)
+    # Only select relevant columns
+    geo_df = geo_df[["geo_level_1_id", 'district', 'latitude', 'longitude']]
+    # Merge X_train with geocoded_districts
+    df = pd.merge(df, geo_df, on="geo_level_1_id")
+    if drop_key:
+        # Drop geo_level_1_id
+        df.drop("geo_level_1_id", axis=1, inplace=True)
+
+    return df
+
+
 def get_risk_status_based_on_geo_level(data=None, df_to_add_info=None, labels=None, geo_level=1):
     """
     This function calculates the probability for the damage grade given the geo_level_id. 

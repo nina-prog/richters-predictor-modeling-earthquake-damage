@@ -48,8 +48,8 @@ This repository contains our project of the phase 1 of the **Practical Course: D
 
 3. [Optional] Create a virtual environment and activate it. For example, using the built-in `venv` module in Python:
    ```
-   python3 -m venv env
-   source env/bin/activate
+   python3 -m venv venv-phase-1
+   source venv-phase-1/bin/activate
    ```
 
 4. Install the required packages by running the following command in your terminal:

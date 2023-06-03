@@ -2,7 +2,7 @@ paths:
     train_values: "data/raw/train_values.csv"
     train_labels: "data/raw/train_labels.csv"
     test_values: "data/raw/test_values.csv"
-    geocoded_districts: "data/processed/geocoded_districts.csv"
+    geocoded_districts: "data/processed/geocoded_districts_affected.csv"
     result: "data/predictions/targaryen_prediction.csv"
 data_cleaning:
     columns_to_remove: ['has_secondary_use_rental',
@@ -59,7 +59,7 @@ feature_engineering:
     geocode_districts:
         skip: false
         drop_key: false
-        path: "data/processed/geocoded_districts.csv"
+        path: "data/processed/geocoded_districts_affected.csv"
     group_categorical: 
         skip: false
     risk_status: 

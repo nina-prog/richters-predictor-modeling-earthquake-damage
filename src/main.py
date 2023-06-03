@@ -107,8 +107,8 @@ if not cfg["feature_engineering"]["geocoded_districts"].get("skip", False):
                                                 geo_path=cfg["feature_engineering"]["geocoded_districts"]["geo_path"],
                                                 drop_key=cfg["feature_engineering"]["geocoded_districts"]["drop_key"])
     test_data_cleaned = get_geocoded_districts(df=test_values,
-                                                  geo_path=cfg["feature_engineering"]["geocoded_districts"]["geo_path"],
-                                                  drop_key=cfg["feature_engineering"]["geocoded_districts"]["drop_key"])
+                                               geo_path=cfg["feature_engineering"]["geocoded_districts"]["geo_path"],
+                                               drop_key=cfg["feature_engineering"]["geocoded_districts"]["drop_key"])
 
 # Add superstructure quality
 if not cfg["feature_engineering"]["superstructure_quality"].get("skip", False):

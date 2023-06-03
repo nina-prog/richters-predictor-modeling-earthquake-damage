@@ -105,15 +105,12 @@ def normalize_test_data(x_test: pd.DataFrame, scaler) -> pd.DataFrame:
 
 def get_geocoded_districts(df, geo_path, drop_key=False):
     """
-    Get and add geocoded information to X_train. The geocoded information is the district name, latitude and longitude.
-    The district name is mapped to the geo_level_1_id of X_train. The latitude and longitude are mapped to the district
-     name. The geocoded information is added as new features to X_train.
+    Get and add geocoded information to X_train. The geocoded information is the district name, latitude and longitude. The district name is mapped to the geo_level_1_id of X_train. The latitude and longitude are mapped to the district name. The geocoded information is added as new features to X_train.
 
     :param df: X_train without geocoded information.
     :type df: pandas.DataFrame
-    :param geo_df: Pandas Dataframe containing the geocoded information. Must contain the columns 'geo_level_1_id',
-    'district', 'latitude' and 'longitude'.
-    :type geo_df: pandas.DataFrame
+    :param geo_path: Path to geocoded districts.
+    :type geo_path: str
     :param drop_key: Drop key, geo_level_1_id, after merging, defaults to False.
     :type drop_key: bool, optional
 
@@ -126,7 +123,7 @@ def get_geocoded_districts(df, geo_path, drop_key=False):
     df["geo_level_1_id"] = df["geo_level_1_id"].astype(str)
     geo_df["geo_level_1_id"] = geo_df["geo_level_1_id"].astype(str)
     # Only select relevant columns
-    geo_df = geo_df[["geo_level_1_id", 'district', 'latitude', 'longitude']]
+    geo_df = geo_df[["geo_level_1_id", 'district', 'latitude', 'longitude', 'min_dist_epicenter', 'max_dist_epicenter']]
     # Merge X_train with geocoded_districts
     df = pd.merge(df, geo_df, on="geo_level_1_id")
     if drop_key:

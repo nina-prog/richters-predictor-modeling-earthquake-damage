@@ -63,7 +63,7 @@ def handle_outliers_IQR(df, ignore_cols, iqr_factor=1.5, method="replace", verbo
     outlier_rows = outlier_mask.any(axis=1)
 
     if verbose:
-        print(f"Found {outlier_mask.sum().sum()} outliers,using method'{method}'to handle them:")
+        print(f"Found {outlier_mask.sum().sum()} outliers,using method '{method}' to handle them:")
         print(f"Count per column: {outlier_mask.sum().to_dict()}")
         print(f"Lower bound: {lower_bound.to_dict()}")
         print(f"Upper bound: {upper_bound.to_dict()}")

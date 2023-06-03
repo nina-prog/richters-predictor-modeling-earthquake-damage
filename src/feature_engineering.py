@@ -287,7 +287,6 @@ def get_quality_of_superstructure(raw_data=None, df_to_add_info=None):
     df_to_add_info = df_to_add_info.reset_index()
     raw_data = raw_data.reset_index()
     result = df_to_add_info.set_index("building_id").join(raw_data[["building_id", "superstructure_quality"]].set_index("building_id"))
-    result.reset_index(inplace=True)
     
     return result
 

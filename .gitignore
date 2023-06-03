@@ -1,6 +1,8 @@
 # Data directory
-/data/
-!data/processed/geocoded_districts.csv
+/data/*
+!/data/processed/geocoded_districts_affected.csv
+# include specific files
+
 
 # IDE (Integrated Development Environment)
 .idea/

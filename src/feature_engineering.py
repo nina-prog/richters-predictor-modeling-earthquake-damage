@@ -105,15 +105,12 @@ def normalize_test_data(x_test: pd.DataFrame, scaler) -> pd.DataFrame:
 
 def get_geocoded_districts(df, geo_path, drop_key=False):
     """
-    Get and add geocoded information to X_train. The geocoded information is the district name, latitude and longitude.
-    The district name is mapped to the geo_level_1_id of X_train. The latitude and longitude are mapped to the district
-     name. The geocoded information is added as new features to X_train.
+    Get and add geocoded information to X_train. The geocoded information is the district name, latitude and longitude. The district name is mapped to the geo_level_1_id of X_train. The latitude and longitude are mapped to the district name. The geocoded information is added as new features to X_train.
 
     :param df: X_train without geocoded information.
     :type df: pandas.DataFrame
-    :param geo_df: Pandas Dataframe containing the geocoded information. Must contain the columns 'geo_level_1_id',
-    'district', 'latitude' and 'longitude'.
-    :type geo_df: pandas.DataFrame
+    :param geo_path: Path to geocoded districts.
+    :type geo_path: str
     :param drop_key: Drop key, geo_level_1_id, after merging, defaults to False.
     :type drop_key: bool, optional
 
@@ -123,16 +120,19 @@ def get_geocoded_districts(df, geo_path, drop_key=False):
     # Load geocoded districts
     geo_df = pd.read_csv(geo_path)
     # Make sure key column is of the same type
-    df["geo_level_1_id"] = df["geo_level_1_id"].astype(str)
-    geo_df["geo_level_1_id"] = geo_df["geo_level_1_id"].astype(str)
+    df["geo_level_1_id"] = df["geo_level_1_id"].astype(int)
+    geo_df["geo_level_1_id"] = geo_df["geo_level_1_id"].astype(int)
     # Only select relevant columns
-    geo_df = geo_df[["geo_level_1_id", 'district', 'latitude', 'longitude']]
+    geo_df = geo_df[["geo_level_1_id", 'district', 'latitude', 'longitude', 'min_dist_epicenter', 'max_dist_epicenter']]
     # Merge X_train with geocoded_districts
-    df = pd.merge(df, geo_df, on="geo_level_1_id")
+    df = df.reset_index()
+    df = df.merge(geo_df, on="geo_level_1_id", how="left")
+    df = df.set_index("building_id")
+    #df = pd.merge(df, geo_df, on="geo_level_1_id")
     if drop_key:
         # Drop geo_level_1_id
         df.drop("geo_level_1_id", axis=1, inplace=True)
-
+    
     return df
 
 
@@ -250,10 +250,10 @@ def get_quality_of_superstructure(raw_data=None, df_to_add_info=None):
     Based on the features in the raw data the following ordinal feature is created: 
     Good superstructures get the value 1, Bad superstructures get the value -1 and everything else 0 (including combinations). 
     
-    :param raw_data The raw dataframe including the has_superstructure_X columns
-    :param df_to_add_info The dataframe where to add the information to
-    
-    :returns A dataframe with the addtitonal feature 'superstructure_quality'
+    :param raw_data: The raw dataframe including the has_superstructure_X columns
+    :param df_to_add_info: The dataframe where to add the information to
+
+    :return: The dataframe with the added information about the quality of the superstructure.
     """
     # encode superstructure as good = 1, no idea = 0; bad = -1
     # Also set combinations of good+bad, good+other, bad+other to 0
@@ -284,7 +284,10 @@ def get_quality_of_superstructure(raw_data=None, df_to_add_info=None):
     ] = 0
 
     # Join new info to df
-    result = df_to_add_info.join(raw_data[["superstructure_quality"]], how="left")
+    df_to_add_info = df_to_add_info.reset_index()
+    raw_data = raw_data.reset_index()
+    result = df_to_add_info.set_index("building_id").join(raw_data[["building_id", "superstructure_quality"]].set_index("building_id"))
+    result.reset_index(inplace=True)
     
     return result
 

@@ -56,8 +56,8 @@ train_labels = pd.read_csv(train_labels_path).set_index("building_id")
 test_values = pd.read_csv(test_values_path).set_index("building_id")
 
 """ Make Sample Size smaller for experimenting and testing; Keep commented! 
-#train_values = train_values.iloc[:5000]
-#train_labels = train_labels.iloc[:5000]
+# train_values = train_values.iloc[:10000]
+# train_labels = train_labels.iloc[:10000]
 """
 
 """ ########## Data Cleaning ########## """
@@ -100,15 +100,16 @@ if not cfg["feature_engineering"]["risk_status"].get("skip", False):
                                                             geo_level=cfg["feature_engineering"]["risk_status"]["geo_level"])
 
 # Add geocoded districts features
-if not cfg["feature_engineering"]["geocoded_districts"].get("skip", False):
+if not cfg["feature_engineering"]["geocode_districts"].get("skip", False):
     if verbosity >= 1:
-        print("Add geocoded districts features (lat, long, name of the district) ...")
+        print("Add geocoded districts features (lat, long, district name, min distance to epicenter, "
+              "max distance to epicenter) ...")
     train_data_cleaned = get_geocoded_districts(df=train_values,
-                                                geo_path=cfg["feature_engineering"]["geocoded_districts"]["geo_path"],
-                                                drop_key=cfg["feature_engineering"]["geocoded_districts"]["drop_key"])
+                                                geo_path=cfg["feature_engineering"]["geocode_districts"]["path"],
+                                                drop_key=cfg["feature_engineering"]["geocode_districts"]["drop_key"])
     test_data_cleaned = get_geocoded_districts(df=test_values,
-                                                  geo_path=cfg["feature_engineering"]["geocoded_districts"]["geo_path"],
-                                                  drop_key=cfg["feature_engineering"]["geocoded_districts"]["drop_key"])
+                                               geo_path=cfg["feature_engineering"]["geocode_districts"]["path"],
+                                               drop_key=cfg["feature_engineering"]["geocode_districts"]["drop_key"])
 
 # Add superstructure quality
 if not cfg["feature_engineering"]["superstructure_quality"].get("skip", False):

@@ -55,10 +55,10 @@ train_values = pd.read_csv(train_values_path).set_index("building_id")
 train_labels = pd.read_csv(train_labels_path).set_index("building_id")
 test_values = pd.read_csv(test_values_path).set_index("building_id")
 
-""" Make Sample Size smaller for experimenting and testing; Keep commented! """
-train_values = train_values.iloc[:10000]
-train_labels = train_labels.iloc[:10000]
-
+""" Make Sample Size smaller for experimenting and testing; Keep commented! 
+# train_values = train_values.iloc[:10000]
+# train_labels = train_labels.iloc[:10000]
+"""
 
 """ ########## Data Cleaning ########## """
 # Prepare raw data

@@ -250,10 +250,10 @@ def get_quality_of_superstructure(raw_data=None, df_to_add_info=None):
     Based on the features in the raw data the following ordinal feature is created: 
     Good superstructures get the value 1, Bad superstructures get the value -1 and everything else 0 (including combinations). 
     
-    :param raw_data The raw dataframe including the has_superstructure_X columns
-    :param df_to_add_info The dataframe where to add the information to
-    
-    :returns A dataframe with the addtitonal feature 'superstructure_quality'
+    :param raw_data: The raw dataframe including the has_superstructure_X columns
+    :param df_to_add_info: The dataframe where to add the information to
+
+    :return: The dataframe with the added information about the quality of the superstructure.
     """
     # encode superstructure as good = 1, no idea = 0; bad = -1
     # Also set combinations of good+bad, good+other, bad+other to 0
@@ -261,44 +261,28 @@ def get_quality_of_superstructure(raw_data=None, df_to_add_info=None):
     # Default to -1 --> all bad are right
     raw_data["superstructure_quality"] = -1
 
-    # Update all good superstructures
-    raw_data.loc[(raw_data["has_superstructure_bamboo"] == 1) | 
-                (raw_data["has_superstructure_rc_engineered"] == 1) | 
-                (raw_data["has_superstructure_rc_non_engineered"] == 1) | 
-                (raw_data["has_superstructure_timber"] == 1), "superstructure_quality"] = 1
+    # Init superstructure quality for - all good superstructures (steel, bamboo, timber, reinforced concrete) to 1
+    good_superstructures = ["has_superstructure_bamboo", "has_superstructure_rc_engineered",
+                            "has_superstructure_rc_non_engineered", "has_superstructure_timber"]
+    has_good_superstructures = raw_data[good_superstructures].any(axis=1)
+    raw_data.loc[has_good_superstructures, "superstructure_quality"] = 1
 
-    # Update all other superstructures
-    raw_data.loc[(raw_data["has_superstructure_other"] == 1), "superstructure_quality"] = 0
+    # Init superstructure quality for - all other superstructures (other than good or bad) to 0
+    raw_data.loc[raw_data["has_superstructure_other"] == 1, "superstructure_quality"] = 0
 
-    # Update combinations of superstructures
-    # Combination of good + other
-    raw_data.loc[((raw_data["has_superstructure_bamboo"] == 1) | 
-                (raw_data["has_superstructure_rc_engineered"] == 1) | 
-                (raw_data["has_superstructure_rc_non_engineered"] == 1) | 
-                (raw_data["has_superstructure_timber"] == 1)) & 
-                (raw_data["has_superstructure_other"] == 1), "superstructure_quality"] = 0
+    # Update different combinations of superstructure of good+other or good+bad or bad+other to 0
+    bad_superstructures = ["has_superstructure_adobe_mud", "has_superstructure_mud_mortar_stone",
+                           "has_superstructure_cement_mortar_stone", "has_superstructure_mud_mortar_brick",
+                           "has_superstructure_cement_mortar_brick", "has_superstructure_stone_flag"]
+    has_bad_superstructures = raw_data[bad_superstructures].any(axis=1)
 
-    # Combination of good + bad
-    raw_data.loc[((raw_data["has_superstructure_bamboo"] == 1) | 
-                (raw_data["has_superstructure_rc_engineered"] == 1) | 
-                (raw_data["has_superstructure_rc_non_engineered"] == 1) | 
-                (raw_data["has_superstructure_timber"] == 1)) & 
-                ((raw_data["has_superstructure_adobe_mud"] == 1) |
-                (raw_data["has_superstructure_mud_mortar_stone"] == 1) |
-                (raw_data["has_superstructure_cement_mortar_stone"] == 1) |
-                (raw_data["has_superstructure_mud_mortar_brick"] == 1) |
-                (raw_data["has_superstructure_cement_mortar_brick"] == 1) |
-                (raw_data["has_superstructure_stone_flag"] == 1)), "superstructure_quality"] = 0
+    raw_data.loc[
+        (has_good_superstructures & raw_data["has_superstructure_other"] == 1) |
+        (has_good_superstructures & has_bad_superstructures) |
+        (raw_data["has_superstructure_other"] == 1 & has_bad_superstructures),
+        "superstructure_quality"
+    ] = 0
 
-    # Combination of bad + other
-    raw_data.loc[(raw_data["has_superstructure_other"] == 1) & 
-                ((raw_data["has_superstructure_adobe_mud"] == 1) |
-                (raw_data["has_superstructure_mud_mortar_stone"] == 1) |
-                (raw_data["has_superstructure_cement_mortar_stone"] == 1) |
-                (raw_data["has_superstructure_mud_mortar_brick"] == 1) |
-                (raw_data["has_superstructure_cement_mortar_brick"] == 1) |
-                (raw_data["has_superstructure_stone_flag"] == 1)), "superstructure_quality"] = 0
-    
     # Join new info to df
     df_to_add_info = df_to_add_info.reset_index()
     raw_data = raw_data.reset_index()
